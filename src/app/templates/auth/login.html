@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block page_title %}
+    Login
+{% endblock %}
+
+{% block main %}
+    <div class="container border rounded text-center p-5 m-5 ">
+        <form class="mx-auto" action="{{ url_for('auth.login')}}" method="post">
+            <fieldset>
+                <legend>Login</legend>
+            </fieldset>
+            <button type="submit" class="btn btn-outline-success mt-3">Login</button>
+        </form>
+    </div>
+{% endblock %}
