@@ -93,6 +93,13 @@
                                 >Login</a
                             >
                         </li>
+                        <li class="nav-item">
+                            <a
+                                href="{{ url_for('auth.signup') }}"
+                                class="nav-link fw-semibold"
+                                >Sign Up</a
+                            >
+                        </li>
                         {% endif %}
                     </ul>
                 </div>
@@ -115,5 +122,6 @@
                 }
             });
         </script>
+        {% block script %}{% endblock %}
     </body>
 </html>
