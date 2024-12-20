@@ -329,4 +329,5 @@ pip-selfcheck.json
 !.gitkeep
 app.db
 sessions/
+migrations/
 
