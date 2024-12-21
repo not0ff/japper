@@ -8,7 +8,7 @@
 {% block main %}
     <div class="container border rounded p-5 m-5 ">
         <form class="mx-auto needs-validation" action="{{ url_for('auth.login')}}" method="post" novalidate>
-            {{ form.csrf_token() }}
+            {{ form.csrf_token }}
             <div class="form-floating mb-3">
                 {{ render_tag(form.username, class='form-control bg-secondary-subtle'+(' is-invalid' if form.username.errors else ''), id='username', placeholder='Username') }}
                 {{ render_tag(form.username.label, class='form-label') }}

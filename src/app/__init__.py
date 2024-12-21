@@ -2,7 +2,7 @@ from flask import Flask
 from flask_session import Session
 
 from config import Config
-from app.extensions import db, migrate
+from app.extensions import db, migrate, csrf
 
 
 def create_app(config_class=Config):
@@ -12,6 +12,7 @@ def create_app(config_class=Config):
     Session(app)
     db.init_app(app)
     migrate.init_app(app, db)
+    csrf.init_app(app)
 
     from app.core import core
     app.register_blueprint(core)

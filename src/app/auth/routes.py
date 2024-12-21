@@ -11,6 +11,7 @@ def login():
         return redirect(url_for('core.index'))
     return render_template('auth/login.html', form=form)
 
+
 @auth.route('/signup/', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
@@ -18,7 +19,6 @@ def signup():
         session['logged'] = True
         return redirect(url_for('core.index'))
     return render_template('auth/signup.html', form=form)
-
 
 
 @auth.route('/logout/')
