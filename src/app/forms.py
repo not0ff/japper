@@ -1,21 +1,27 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, EqualTo, Length
+from wtforms.validators import ValidationError, DataRequired, EqualTo, Length
+from app.models import User
 
 
 class SignupForm(FlaskForm):
-    username = StringField('Username', description='Enter a username 3-16 characters long', validators=[DataRequired(
+    username = StringField('Username', validators=[DataRequired(
         message='Enter a username'), Length(min=3, max=16, message='Username must be between %(min)d and %(max)d characters long')])
-    password = PasswordField('Password', description='Provide a passwords with at least 8 characters', validators=[DataRequired(
+    password = PasswordField('Password', validators=[DataRequired(
         message='Enter a password'), Length(min=8, max=120, message='Password must have at least %(min)d characters')])
-    confirm_password = PasswordField('Repeat password', description='Enter a matching password', validators=[
+    confirm_password = PasswordField('Repeat password', validators=[
                                      DataRequired(message='Repeat your password'), EqualTo('password', message='Passwords must be equal')])
     submit = SubmitField('Sign Up')
 
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user is not None:
+            raise ValidationError('This username is already taken')
+
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', description='Enter your username', validators=[
+    username = StringField('Username', validators=[
                            DataRequired(message='Enter a username')])
-    password = PasswordField('Password', description='Provide a valid password', validators=[
+    password = PasswordField('Password', validators=[
                              DataRequired(message='Enter a password')])
     submit = SubmitField('Login')

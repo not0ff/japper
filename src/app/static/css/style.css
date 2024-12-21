@@ -13,3 +13,8 @@
     font-weight: 400;
     font-style: normal;
 }
+
+.flash_list {
+    list-style-type: none;
+    padding-inline-start: 0px;
+}
