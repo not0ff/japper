@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% from "_formhelpers.html" import render_tag %}
+{% from "_formhelpers.html" import render_auth_field %}
 
 {% block page_title %}
     Sign Up
@@ -7,50 +7,14 @@
 
 {% block main %}
     <div class="container border rounded my-5 d-flex justify-content-center">
-        <form class="mx-auto needs-validation" action="{{ url_for('auth.signup')}}" method="post" novalidate>
+        <form class="mx-auto" action="{{ url_for('auth.signup')}}" method="post" novalidate>
             {{ form.csrf_token }}
             <fieldset class="mt-3 mb-5 text-center">
                 <legend class="h2 mb-4">Create new Japper account</legend>
-                <div class="form-floating mb-3">
-                    {{ render_tag(form.username, class='form-control bg-secondary-subtle'+(' is-invalid' if form.username.errors else ''), id='username', placeholder='Username') }}
-                    {{ render_tag(form.username.label, class='form-label') }}
-                    <div class="invalid-feedback">
-                        {% if form.username.errors %}
-                            {% for error in form.username.errors %}
-                                {{ error }}<br>
-                            {% endfor %}
-                        {% else %}
-                            {{ form.username.description }}
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="form-floating mb-3">
-                    {{ render_tag(form.password, class='form-control bg-secondary-subtle'+(' is-invalid' if form.password.errors else ''), id='password', placeholder='Username') }}
-                    {{ render_tag(form.password.label, class='form-label') }}
-                    <div class="invalid-feedback">
-                        {% if form.password.errors %}
-                            {% for error in form.password.errors %}
-                                {{ error }}<br>
-                            {% endfor %}
-                        {% else %}
-                            {{ form.password.description }}
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="form-floating mb-3">
-                    {{ render_tag(form.confirm_password, class='form-control bg-secondary-subtle'+(' is-invalid' if form.confirm_password.errors else ''), id='confirm_password', placeholder='Username') }}
-                    {{ render_tag(form.confirm_password.label, class='form-label') }}
-                    <div class="invalid-feedback">
-                        {% if form.confirm_password.errors %}
-                            {% for error in form.confirm_password.errors %}
-                                {{ error }}<br>
-                            {% endfor %}
-                        {% else %}
-                            {{ form.confirm_password.description }}
-                        {% endif %}
-                    </div>
-                </div>
-                {{ render_tag(form.submit, class="btn btn-outline-success") }}
+                {{ render_auth_field(form.username) }}
+                {{ render_auth_field(form.password) }}
+                {{ render_auth_field(form.confirm_password) }}
+                {{ form.submit(class_="btn btn-outline-success") }}
             </fieldset>
         </form>
     </div>
