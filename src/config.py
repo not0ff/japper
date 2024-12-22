@@ -16,6 +16,7 @@ class Config:
     SESSION_TYPE = 'cachelib'
     SESSION_CACHELIB = FileSystemCache(cache_dir='sessions')
     SESSION_PERMANENT = False
+    USE_SESSION_FOR_NEXT = True
 
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URI') or 'sqlite:///' + os.path.join(basedir, 'app.db')

@@ -9,3 +9,10 @@
         </div>
     </div>
 {% endmacro %}
+
+{% macro render_checkbox(field) %}
+    <div class="form-check mb-3">
+        {{ field(class_='form-check-input bg-secondary-subtle') }}
+        {{ field.label(class_='form-check-label') }}
+    </div>
+{% endmacro %}
