@@ -17,11 +17,11 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password!', category='danger')
-            return redirect(url_for('.login'))
+            return redirect(url_for('.login', **request.args))
 
         login_user(user)
-        next_page = request.form.get('next')
-        if next_page is not None and is_safe_url(next_page, {"http://127.0.0.1:5000/"}):
+        next_page = request.args.get('next')
+        if next_page is not None and is_safe_url(next_page, {request.root_url}):
             return redirect(next_page)
 
         return redirect(url_for('core.index'))

@@ -7,9 +7,8 @@
 
 {% block main %}
     <div class="container border rounded my-5 d-flex justify-content-center">
-        <form class="mx-auto" action="{{ url_for('auth.login')}}" method="post" novalidate>
+        <form class="mx-auto" action="{{ url_for('.login', **request.args) }}" method="post" novalidate>
             {{ form.csrf_token }}
-            <input type="hidden" name="next" value="{{ request.args.get('next') }}">
             <fieldset class="mt-3 mb-5 text-center">
                 <legend class="h2 mb-4">Log in to Japper</legend>
                 {{ render_auth_field(form.username) }}
@@ -18,8 +17,4 @@
             </fieldset>
         </form>
     </div>
-{% endblock %}
-
-{% block script %}
-    <script src="{{ url_for('static', filename='js/form_validation.js') }}"></script>
 {% endblock %}
