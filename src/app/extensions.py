@@ -11,5 +11,6 @@ session: Session = Session()
 login_manager: LoginManager = LoginManager()
 
 login_manager.login_view = 'auth.login'
+login_manager.session_protection = 'strong'
 login_manager.login_message = 'You need to log in to access this page'
 login_manager.login_message_category = 'warning'
