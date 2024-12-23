@@ -1,32 +1,34 @@
-from flask import render_template, redirect, url_for
+from flask import redirect, render_template, url_for
+from flask.typing import ResponseReturnValue
 from flask_login import login_required
+
 from . import core
 
 
 @core.route('/')
-def index():
+def index() -> ResponseReturnValue:
     return redirect(url_for('core.feed'))
 
 
 @core.route('/feed/')
 @login_required
-def feed():
+def feed() -> ResponseReturnValue:
     return render_template('core/feed.html')
 
 
 @core.route('/newest/')
 @login_required
-def newest():
+def newest() -> ResponseReturnValue:
     return render_template('core/newest.html')
 
 
 @core.route('/search/')
 @login_required
-def search():
+def search() -> ResponseReturnValue:
     return render_template('core/search.html')
 
 
 @core.route('/profile/')
 @login_required
-def profile():
+def profile() -> ResponseReturnValue:
     return render_template('core/profile.html')

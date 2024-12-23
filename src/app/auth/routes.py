@@ -1,14 +1,17 @@
-from flask import render_template, redirect, url_for, flash, request, session
-from flask_login import login_user, logout_user, login_required, current_user
+from flask import flash, redirect, render_template, request, session, url_for
+from flask.typing import ResponseReturnValue
+from flask_login import current_user, login_required, login_user, logout_user
 from is_safe_url import is_safe_url
+
 from app import db
 from app.forms import LoginForm, SignupForm
 from app.models import User
+
 from . import auth
 
 
 @auth.route('/login/', methods=['GET', 'POST'])
-def login():
+def login() -> ResponseReturnValue:
     if current_user.is_authenticated:
         return redirect(url_for('core.index'))
 
@@ -29,7 +32,7 @@ def login():
 
 
 @auth.route('/signup/', methods=['GET', 'POST'])
-def signup():
+def signup() -> ResponseReturnValue:
     if current_user.is_authenticated:
         return redirect(url_for('core.index'))
 
@@ -47,6 +50,6 @@ def signup():
 
 @auth.route('/logout/')
 @login_required
-def logout():
+def logout() -> ResponseReturnValue:
     logout_user()
     return redirect(url_for('.login'))

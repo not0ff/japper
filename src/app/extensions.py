@@ -1,14 +1,14 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
+from flask_migrate import Migrate
 from flask_session import Session
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 
-db = SQLAlchemy()
-migrate = Migrate()
-csrf = CSRFProtect()
-session = Session()
-login_manager = LoginManager()
+db: SQLAlchemy = SQLAlchemy()
+migrate: Migrate = Migrate()
+csrf: CSRFProtect = CSRFProtect()
+session: Session = Session()
+login_manager: LoginManager = LoginManager()
 
 login_manager.login_view = 'auth.login'
 login_manager.login_message = 'You need to log in to access this page'

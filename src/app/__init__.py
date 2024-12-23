@@ -1,11 +1,12 @@
 from flask import Flask
+from flask.wrappers import Request
 
+from app.extensions import csrf, db, login_manager, migrate, session
 from config import Config
-from app.extensions import db, migrate, csrf, login_manager, session
 
 
-def create_app(config_class=Config):
-    app = Flask(__name__)
+def create_app(config_class=Config) -> Flask:
+    app: Flask = Flask(__name__)
     app.config.from_object(config_class)
 
     session.init_app(app)
@@ -21,7 +22,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auth)
 
     @app.after_request
-    def add_header(request):
+    def add_header(request: Request) -> Request:
         request.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         request.headers['Pragma'] = 'no-cache'
         request.headers['Expires'] = '0'
