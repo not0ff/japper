@@ -11,14 +11,13 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY: Optional[str] = os.getenv('SECRET_KEY')
-
-    # MAX_CONTENT_LENGTH = 10 * 1024 * 1024
-    # UPLOAD_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp']
+    
+    UPLOADED_PROFILES_DEST = os.path.join(basedir, 'uploads/profiles')
+    UPLOADED_POSTS_DEST = os.path.join(basedir, 'uploads/posts')
+    MAX_CONTENT_LENGTH = 30 * 1024 * 1024
 
     SESSION_TYPE: str = 'cachelib'
     SESSION_CACHELIB: FileSystemCache = FileSystemCache(cache_dir='sessions')
-    
-
     USE_SESSION_FOR_NEXT: bool = True
     REMEMBER_COOKIE_DURATION: timedelta = timedelta(weeks=1)
 

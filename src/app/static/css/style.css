@@ -18,3 +18,8 @@
     list-style-type: none;
     padding-inline-start: 0px;
 }
+
+.profile-pic {
+    width: clamp(50px, 40vw, 200px);
+    height: auto;
+}

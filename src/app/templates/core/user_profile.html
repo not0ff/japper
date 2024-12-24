@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block page_title %}
+    Profile
+{% endblock %}
+
+{% block main %}
+<div class="container border rounded-4 mt-2 p-4">
+    <div class="row">
+        <div class="col-4">
+            <img
+                src="{{ url_for('.profile_pic', username=current_user.username) }}"
+                alt="Profile picture"
+                class="profile-pic img-thumbnail rounded-circle" />
+        </div>
+        <div class="col d-flex justify-content-end">
+            <button class="btn btn-outline-primary align-self-start" data-bs-toggle="modal" data-bs-target="#editProfile">Edit profile</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p class="h3 pt-2 flow-start text-nowrap">{{ current_user.username }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-5">
+            {% if current_user.bio != None %}
+                <span class="h6 ms-2 flow-start">{{ current_user.bio }}</span>
+            {% else %}
+                <span class="fst-italic ms-2 flow-start">No bio</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="editProfile" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit your profile information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form class="mx-auto" action="{{ url_for('.profile', username=current_user.username)}}" method="post" enctype=multipart/form-data novalidate>
+                    {{ form.csrf_token }}
+                    <fieldset class="mt-3 mb-5">
+                        {{ form.bio.label()}}
+                        {{ form.bio()}}
+                        {{ form.profile_img.label()}}
+                        {{ form.profile_img()}}
+                        {{ form.submit(class_="btn btn-outline-success") }}
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

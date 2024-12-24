@@ -5,5 +5,28 @@
 {% endblock %}
 
 {% block main %}
-    Profile page
+<div class="container border rounded-4 mt-2 p-4">
+    <div class="row">
+        <div class="col-4">
+            <img
+                src="{{ url_for('.profile_pic', username=user.username) }}"
+                alt="Profile picture"
+                class="profile-pic img-thumbnail rounded-circle" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p class="h3 pt-2 flow-start text-nowrap">{{ user.username }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-5">
+            {% if user.bio != None %}
+                <span class="h6 ms-2 flow-start">{{ user.bio }}</span>
+            {% else %}
+                <span class="fst-italic ms-2 flow-start">No bio</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

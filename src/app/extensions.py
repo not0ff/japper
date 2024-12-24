@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
+from flask_uploads import UploadSet, IMAGES
 
 db: SQLAlchemy = SQLAlchemy()
 migrate: Migrate = Migrate()
@@ -14,3 +15,7 @@ login_manager.login_view = 'auth.login'
 login_manager.session_protection = 'strong'
 login_manager.login_message = 'You need to log in to access this page'
 login_manager.login_message_category = 'warning'
+
+profile_imgs: UploadSet = UploadSet('profiles', IMAGES)
+post_imgs: UploadSet = UploadSet('posts', IMAGES)
+uploads: list[UploadSet] = [profile_imgs, post_imgs]

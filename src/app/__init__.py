@@ -1,7 +1,8 @@
 from flask import Flask
 from flask.wrappers import Request
+from flask_uploads import configure_uploads
 
-from app.extensions import csrf, db, login_manager, migrate, session
+from app.extensions import csrf, db, login_manager, migrate, session, uploads
 from config import Config
 
 
@@ -14,6 +15,7 @@ def create_app(config_class=Config) -> Flask:
     migrate.init_app(app, db)
     csrf.init_app(app)
     login_manager.init_app(app)
+    configure_uploads(app, uploads)
 
     from app.core import core
     app.register_blueprint(core)

@@ -1,10 +1,13 @@
 from typing import Optional
 
+from filetype import guess_extension
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField, FileSize
 from wtforms import (BooleanField, Field, PasswordField, StringField,
-                     SubmitField)
+                     SubmitField, TextAreaField)
 from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
 
+from app.extensions import profile_imgs
 from app.models import User
 
 
@@ -30,3 +33,18 @@ class LoginForm(FlaskForm):
         DataRequired(message='Enter a password')])
     remember: BooleanField = BooleanField('Remember me')
     submit: SubmitField = SubmitField('Login')
+
+
+class EditProfileForm(FlaskForm):
+    profile_img: FileField = FileField('Profile picture', validators=[
+        FileAllowed(profile_imgs, message='Pick an image file!'),
+        FileSize(max_size=8*1024*1024, message='File is bigger than 8MB!')])
+    bio: TextAreaField = TextAreaField('Bio', validators=[
+        Length(max=120, message='You can use at most 120 characters')
+    ])
+    submit: SubmitField = SubmitField('Submit')
+
+    def validate_profile_img(self, img: Field) -> None:
+        ext = guess_extension(img.data)
+        if ext is None or not profile_imgs.extension_allowed(ext):
+            raise ValidationError('Invalid image format')

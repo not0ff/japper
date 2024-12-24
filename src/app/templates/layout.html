@@ -18,7 +18,7 @@
     </head>
     <body class="bg-dark-subtle fredoka-text">
         <nav
-            class="navbar navbar-expand-lg bg-dark navbar-dark border-bottom border-dark-subtle mb-5">
+            class="navbar navbar-expand-lg bg-dark navbar-dark border-bottom border-dark-subtle">
             <div class="container-fluid">
                 <a href="#" class="navbar-brand ms-1">
                     <img
@@ -65,7 +65,7 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a
-                                href="{{ url_for('core.profile') }}"
+                                href="{{ url_for('core.profile', username=current_user.username) }}"
                                 class="nav-link dropdown-toggle fw-semibold"
                                 role="button"
                                 data-bs-toggle="dropdown"
@@ -78,7 +78,7 @@
                                 </li>
                                 <li>
                                     <a
-                                        href="{{ url_for('core.profile') }}"
+                                        href="{{ url_for('core.profile', username=current_user.username) }}"
                                         class="dropdown-item fw-semibold"
                                         >{{ current_user.username }}</a
                                     >
@@ -116,7 +116,7 @@
         <div class="container text-center">
             {% with messages = get_flashed_messages(with_categories=true) %} 
             {% if messages %}
-            <ul class="flash_list">
+            <ul class="flash_list mt-5">
                 {% for category, message in messages %}
                 <li>
                     <div class="alert alert-dismissible alert-{{ category }}">

@@ -330,4 +330,4 @@ pip-selfcheck.json
 app.db
 sessions/
 migrations/
-
+uploads/
