@@ -16,13 +16,13 @@
     </div>
     <div class="row">
         <div class="col">
-            <p class="h3 pt-2 flow-start text-nowrap">{{ user.username }}</p>
+            <p class="h3 pt-2 flow-start">{{ user.username }}</p>
         </div>
     </div>
     <div class="row">
         <div class="col-5">
             {% if user.bio != None %}
-                <span class="h6 ms-2 flow-start">{{ user.bio }}</span>
+                <p class="h6 ms-2 flow-start text-break">{{ user.bio }}</p>
             {% else %}
                 <span class="fst-italic ms-2 flow-start">No bio</span>
             {% endif %}

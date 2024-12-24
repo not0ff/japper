@@ -1,6 +1,7 @@
 from typing import Optional
 
 from filetype import guess_extension
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileSize
 from wtforms import (BooleanField, Field, PasswordField, StringField,
@@ -42,9 +43,11 @@ class EditProfileForm(FlaskForm):
     bio: TextAreaField = TextAreaField('Bio', validators=[
         Length(max=120, message='You can use at most 120 characters')
     ])
-    submit: SubmitField = SubmitField('Submit')
+    submit: SubmitField = SubmitField('Save changes')
 
     def validate_profile_img(self, img: Field) -> None:
+        if not img.data:
+            return
         ext = guess_extension(img.data)
         if ext is None or not profile_imgs.extension_allowed(ext):
             raise ValidationError('Invalid image format')
