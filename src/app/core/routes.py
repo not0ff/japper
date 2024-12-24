@@ -60,7 +60,7 @@ def edit_profile() -> ResponseReturnValue:
             flash('Profile bio changed', category='success')
 
         if form.profile_img.data:
-            img = optimize_img(form.profile_img.data)
+            img = optimize_img(form.profile_img.data, resize=True)
             name = secure_filename(f'{current_user.id}_pfp.webp')
 
             if path.exists(img_path := profile_imgs.path(name)):
@@ -68,6 +68,9 @@ def edit_profile() -> ResponseReturnValue:
 
             profile_imgs.save(img, name=name)  # type: ignore
             flash('Profile picture updated!', category='success')
+    elif form.errors:
+        for field, errors in form.errors.items(): 
+            for error in errors: flash(f'{field}: {error}', category='danger')
     
     return redirect(url_for('.profile', username=current_user.username))
 
