@@ -60,13 +60,11 @@ def post() -> ResponseReturnValue:
 @core.route('/profile/<username>')
 @login_required
 def profile(username: str) -> ResponseReturnValue:
-    if username == current_user.username:
-        profile_form = EditProfileForm()
-        profile_form.bio.data = current_user.bio
-        return render_template('core/user_profile.html', profile_form=profile_form)
-
+    profile_form = EditProfileForm()
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('core/profile.html', user=user)
+    profile_form.bio.data = user.bio
+    
+    return render_template('core/profile.html', user=user, profile_form=profile_form)
 
 
 @core.route('/profile/edit/', methods=['POST'])

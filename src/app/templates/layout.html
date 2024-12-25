@@ -17,8 +17,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     </head>
     <body class="bg-dark-subtle fredoka-text">
-        <nav
-            class="navbar navbar-expand-lg bg-dark navbar-dark border-bottom border-dark-subtle mb-4">
+        <nav class="navbar navbar-expand-lg bg-dark navbar-dark border-bottom border-dark-subtle mb-4">
             <div class="container-fluid">
                 <a href="#" class="navbar-brand ms-1">
                     <img
@@ -36,25 +35,18 @@
                     data-bs-target="#navbarSupportedContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div
-                    class="collapse navbar-collapse"
-                    id="navbarSupportedContent">
-                    <ul
-                        class="navbar-nav ms-auto me-3 my-1 d-flex justify-content-evenly flex-row gap-3">
-                        {% if current_user.is_authenticated %}
+                <div class="collapse navbar-collapse"  id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto me-3 my-1 d-flex justify-content-evenly flex-row gap-3">
+                    {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a
-                                href="{{ url_for('core.feed') }}"
-                                class="nav-link fw-semibold"
-                                >Feed</a
-                            >
+                            <a href="{{ url_for('core.feed') }}" class="nav-link fw-semibold">
+                                Feed
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a
-                                href="{{ url_for('core.newest') }}"
-                                class="nav-link fw-semibold"
-                                >Newest</a
-                            >
+                            <a href="{{ url_for('core.newest') }}" class="nav-link fw-semibold">
+                                Newest
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link fw-semibold" data-bs-toggle="modal" data-bs-target="#newPost">
@@ -62,81 +54,62 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a
-                                href="{{ url_for('core.search') }}"
-                                class="nav-link fw-semibold"
-                                >Search</a
-                            >
+                            <a href="{{ url_for('core.search') }}" class="nav-link fw-semibold">
+                                Search
+                            </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a
-                                href="{{ url_for('core.profile', username=current_user.username) }}"
-                                class="nav-link dropdown-toggle fw-semibold"
-                                role="button"
-                                data-bs-toggle="dropdown"
-                                >Profile</a
-                            >
-                            <ul
-                                class="dropdown-menu dropdown-menu-end position-absolute">
+                            <a href="{{ url_for('core.profile', username=current_user.username) }}" class="nav-link dropdown-toggle fw-semibold" role="button" data-bs-toggle="dropdown">
+                                Profile
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end position-absolute">
                                 <li>
                                     <h6 class="dropdown-header">User menu</h6>
                                 </li>
                                 <li>
-                                    <a
-                                        href="{{ url_for('core.profile', username=current_user.username) }}"
-                                        class="dropdown-item fw-semibold"
-                                        >{{ current_user.username }}</a
-                                    >
+                                    <a href="{{ url_for('core.profile', username=current_user.username) }}" class="dropdown-item fw-semibold">
+                                        {{ current_user.username }}
+                                    </a>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li>
-                                    <a
-                                        href="{{ url_for('auth.logout') }}"
-                                        class="dropdown-item fw-semibold"
-                                        >Logout</a
-                                    >
+                                    <a href="{{ url_for('auth.logout') }}" class="dropdown-item fw-semibold">
+                                        Logout
+                                    </a>
                                 </li>
                             </ul>
                         </li>
-                        {% else %}
+                    {% else %}
                         <li class="nav-item">
-                            <a
-                                href="{{ url_for('auth.login') }}"
-                                class="nav-link fw-semibold"
-                                >Login</a
-                            >
+                            <a href="{{ url_for('auth.login') }}" class="nav-link fw-semibold">
+                                Login
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a
-                                href="{{ url_for('auth.signup') }}"
-                                class="nav-link fw-semibold"
-                                >Sign Up</a
-                            >
+                            <a href="{{ url_for('auth.signup') }}" class="nav-link fw-semibold">
+                                Sign Up
+                            </a>
                         </li>
-                        {% endif %}
+                    {% endif %}
                     </ul>
                 </div>
             </div>
         </nav>
         <div class="container text-center">
-            {% with messages = get_flashed_messages(with_categories=true) %} 
-            {% if messages %}
+        {% with messages = get_flashed_messages(with_categories=true) %} 
+        {% if messages %}
             <ul class="flash_list">
-                {% for category, message in messages %}
+            {% for category, message in messages %}
                 <li class="alert alert-dismissible alert-{{ category }} fade show mt-2">
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     <span>{{ message }}</span>
                 </li>
-                {% endfor %}
+            {% endfor %}
             </ul>
-            {% endif %} 
-            {% endwith %}
+        {% endif %} 
+        {% endwith %}
         </div>
-        <main
-            class="container-flex d-flex flex-column justify-content-evenly align-items-center">
+        <main class="container-flex d-flex flex-column justify-content-evenly align-items-center">
             {% block main %} {% endblock %}
         </main>
         <div class="modal" id="newPost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
@@ -151,38 +124,26 @@
                             {{ post_form.csrf_token }}
                             <fieldset class="mt-3 mb-5">
                                 <div class="mb-3">
-                                    {{ post_form.post.label(class_="form-label") }}
+                                    {{ post_form.post.label(class_="form-label") }} 
                                     {{ post_form.post(class_="form-control", rows_="3", placeholder_="How is your day?") }}
-                                    <div class="form-text">{{ post_form.post.description }}</div>
+                                    <div class="form-text">
+                                        {{ post_form.post.description }}
+                                    </div>
                                 </div>
                             </fieldset>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
                         {{ post_form.submit(class_="btn btn-primary", id_="postButton") }}
                     </div>
                 </div>
             </div>
         </div>
         {% block modal %}{% endblock %}
-        <script>
-            let url = window.location.href;
-            let navbarLinks = document.querySelectorAll(
-                "ul.navbar-nav a.nav-link"
-            );
-
-            navbarLinks.forEach(function (link) {
-                if (link.href === url) {
-                    link.classList.add("active");
-                }
-            });
-
-            document.getElementById('postButton').addEventListener('click', function() {
-                let post_form = document.getElementById('newPostForm');
-                post_form.submit();
-            });
-        </script>
         {% block script %}{% endblock %}
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     </body>
 </html>
