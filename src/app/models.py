@@ -33,7 +33,7 @@ class Post(db.Model):  # type: ignore
         sa.Integer, sa.ForeignKey(User.id), index=True)
     timestamp: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc), index=True)
-    text: Mapped[str] = mapped_column(sa.String(200), nullable=True)
+    post: Mapped[str] = mapped_column(sa.String(200), nullable=True)
     author: Mapped[User] = relationship(back_populates='posts')
 
 

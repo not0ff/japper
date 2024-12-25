@@ -1,14 +1,15 @@
 from os import path, remove
 
-from flask import (abort, flash, redirect, render_template, send_file,
+from flask import (flash, redirect, render_template, request, send_file,
                    send_from_directory, url_for)
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
+from is_safe_url import is_safe_url
 from werkzeug.utils import secure_filename
 
 from app.extensions import db, profile_imgs
-from app.forms import EditProfileForm
-from app.models import User
+from app.forms import EditProfileForm, PostForm
+from app.models import Post, User
 from app.utils import optimize_img
 
 from . import core
@@ -37,13 +38,32 @@ def search() -> ResponseReturnValue:
     return render_template('core/search.html')
 
 
+@core.route('/post/', methods=['POST'])
+@login_required
+def post() -> ResponseReturnValue:
+    post_form = PostForm()
+    if post_form.validate_on_submit():
+        post = Post(user_id=current_user.id, post=post_form.post.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+    
+    elif post_form.errors:
+        for field, errors in post_form.errors.items(): 
+            for error in errors: flash(f'{field.capitalize()}: {error}', category='danger')
+    
+    next_page = request.referrer
+    if next_page is not None and is_safe_url(next_page, {request.host}):
+        return redirect(next_page)
+    return redirect(url_for('.feed'))
+    
+    
 @core.route('/profile/<username>')
 @login_required
 def profile(username: str) -> ResponseReturnValue:
     if username == current_user.username:
-        form = EditProfileForm()
-        form.bio.data = current_user.bio
-        return render_template('core/user_profile.html', form=form)
+        profile_form = EditProfileForm()
+        profile_form.bio.data = current_user.bio
+        return render_template('core/user_profile.html', profile_form=profile_form)
 
     user = User.query.filter_by(username=username).first_or_404()
     return render_template('core/profile.html', user=user)
@@ -51,16 +71,16 @@ def profile(username: str) -> ResponseReturnValue:
 
 @core.route('/profile/edit/', methods=['POST'])
 def edit_profile() -> ResponseReturnValue:
-    form = EditProfileForm()
-    if form.validate_on_submit():
-        if form.bio.data != current_user.bio and form.bio.data:
-            current_user.bio = form.bio.data
+    profile_form = EditProfileForm()
+    if profile_form.validate_on_submit():
+        if profile_form.bio.data != current_user.bio and profile_form.bio.data:
+            current_user.bio = profile_form.bio.data
             db.session.add(current_user)
             db.session.commit()
             flash('Profile bio changed', category='success')
 
-        if form.profile_img.data:
-            img = optimize_img(form.profile_img.data, resize=True)
+        if profile_form.image.data:
+            img = optimize_img(profile_form.image.data, resize=True)
             name = secure_filename(f'{current_user.id}_pfp.webp')
 
             if path.exists(img_path := profile_imgs.path(name)):
@@ -68,9 +88,9 @@ def edit_profile() -> ResponseReturnValue:
 
             profile_imgs.save(img, name=name)  # type: ignore
             flash('Profile picture updated!', category='success')
-    elif form.errors:
-        for field, errors in form.errors.items(): 
-            for error in errors: flash(f'{field}: {error}', category='danger')
+    elif profile_form.errors:
+        for field, errors in profile_form.errors.items(): 
+            for error in errors: flash(f'{field.capitalize()}: {error}', category='danger')
     
     return redirect(url_for('.profile', username=current_user.username))
 

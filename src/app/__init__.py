@@ -1,8 +1,11 @@
+from typing import Dict
+
 from flask import Flask
 from flask.wrappers import Request
 from flask_uploads import configure_uploads
 
 from app.extensions import csrf, db, login_manager, migrate, session, uploads
+from app.forms import PostForm
 from config import Config
 
 
@@ -22,6 +25,10 @@ def create_app(config_class=Config) -> Flask:
 
     from app.auth import auth
     app.register_blueprint(auth)
+    
+    @app.context_processor
+    def pass_post_form() -> Dict[str, PostForm]:
+        return {'post_form': PostForm()}
 
     @app.after_request
     def add_header(request: Request) -> Request:
