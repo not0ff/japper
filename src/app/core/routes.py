@@ -1,5 +1,6 @@
 from os import path, remove
 
+import sqlalchemy as sa
 from flask import (flash, redirect, render_template, request, send_file,
                    send_from_directory, url_for)
 from flask.typing import ResponseReturnValue
@@ -29,7 +30,8 @@ def feed() -> ResponseReturnValue:
 @core.route('/newest/')
 @login_required
 def newest() -> ResponseReturnValue:
-    return render_template('core/newest.html')
+    posts = Post.query.order_by(sa.desc(Post.timestamp))
+    return render_template('core/newest.html', posts=posts)
 
 
 @core.route('/search/')

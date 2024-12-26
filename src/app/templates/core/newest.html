@@ -5,5 +5,7 @@
 {% endblock %}
 
 {% block main %}
-    Newest posts feed page
+    {% with posts = posts %}
+        {% include "core/posts.html" %}
+    {% endwith %}
 {% endblock %}

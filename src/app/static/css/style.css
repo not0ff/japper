@@ -23,3 +23,16 @@
     width: clamp(50px, 40vw, 200px);
     height: auto;
 }
+
+.profile-pic-small {
+    width: clamp(50px, 4vw, 150px);
+    height: auto;
+}
+
+.post {
+    width: min(500px, 80%);
+}
+
+.newline-text {
+    white-space: pre-wrap;
+}
