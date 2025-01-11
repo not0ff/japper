@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
 
 {% block page_title %}
-    Feed
+    {{ feed_title }}
 {% endblock %}
 
 {% block main %}
-    Posts feed page
+    {% with posts = posts, posts_title=feed_title %}
+        {% include "core/render_posts.html" %}
+    {% endwith %}
 {% endblock %}

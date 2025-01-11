@@ -24,14 +24,15 @@ def index() -> ResponseReturnValue:
 @core.route('/feed/')
 @login_required
 def feed() -> ResponseReturnValue:
-    return render_template('core/feed.html')
+    posts = Post.query.order_by(sa.desc(Post.timestamp))
+    return render_template('core/feed.html', posts=posts, feed_title='Feed')
 
 
 @core.route('/newest/')
 @login_required
 def newest() -> ResponseReturnValue:
     posts = Post.query.order_by(sa.desc(Post.timestamp))
-    return render_template('core/newest.html', posts=posts)
+    return render_template('core/feed.html', posts=posts, feed_title='Newest posts')
 
 
 @core.route('/search/')
@@ -65,8 +66,9 @@ def profile(username: str) -> ResponseReturnValue:
     profile_form = EditProfileForm()
     user = User.query.filter_by(username=username).first_or_404()
     profile_form.bio.data = user.bio
+    posts = Post.query.filter_by(user_id = user.id).order_by(sa.desc(Post.timestamp))
     
-    return render_template('core/profile.html', user=user, profile_form=profile_form)
+    return render_template('core/profile.html', user=user, posts=posts, profile_form=profile_form)
 
 
 @core.route('/profile/edit/', methods=['POST'])

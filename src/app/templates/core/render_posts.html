@@ -1,15 +1,19 @@
+{% if posts_title %}
+<p class="h2 text-body-secondary">{{ posts_title}}</p>
+{% endif %}
+
 {% for post in posts %}
-<div class="post card mt-3">
+<div class="post card mb-3">
     <div class="card-body">
-        <h5 class="card-title">
+        <a class="h5 card-title text-decoration-none" href="{{ url_for('core.profile', username=post.author.username) }}">
             <img class="profile-pic-small rounded-circle img-thumbnail" src="{{ url_for('.profile_pic', username=post.author.username) }}" alt="Profile picture">
             <span>{{ post.author.username }}</span>
-        </h5>
-        <p class="card-text mb-2">
+        </a>
+        <p class="card-text mt-2 mb-2 ms-1">
             <span class="newline-text">{{ post.post }}</span>
         </p>
         <p class="card-subtitle">
-            <small class="text-body-tertiary mb-2">{{ post.timestamp }}</small>
+            <small class="text-body-tertiary mb-2">{{ moment(post.timestamp).fromNow() }}</small>
         </p>
         <a href="#" class="card-link">✨ Aura ✨</a>
         <a href="#" class="card-link">💥 Burn 💥</a>
