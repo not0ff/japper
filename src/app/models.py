@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 import sqlalchemy as sa
-from sqlalchemy.orm import mapped_column, relationship, Mapped, WriteOnlyMapped
+from sqlalchemy.orm import mapped_column, relationship, backref, Mapped
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -16,7 +16,10 @@ class User(UserMixin, db.Model):  # type: ignore
     bio: Mapped[Optional[str]] = mapped_column(sa.String(120), nullable=True)
     password_hash: Mapped[Optional[str]] = mapped_column(
         db.String(120), nullable=True)
-    posts: WriteOnlyMapped['Post'] = relationship(back_populates='author')
+    posts: Mapped['Post'] = relationship(
+        'Post', backref=backref('author'))
+    likes: Mapped['Like'] = relationship(
+        'Like', backref=backref('user'))
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
@@ -26,6 +29,24 @@ class User(UserMixin, db.Model):  # type: ignore
             return False
         return check_password_hash(self.password_hash, password)
 
+    def add_like(self, post: 'Post') -> None:
+        if not self.is_liked(post):
+            like = Like(user_id=self.id, post_id=post.id)
+            db.session.add(like)
+
+    def remove_like(self, post: 'Post') -> None:
+        if self.is_liked(post):
+            Like.query.filter_by(
+                user_id=self.id,
+                post_id=post.id
+            ).delete()
+
+    def is_liked(self, post: 'Post') -> bool:
+        return Like.query.filter_by(
+            user_id=self.id,
+            post_id=post.id
+        ).first() is not None
+
 
 class Post(db.Model):  # type: ignore
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
@@ -34,7 +55,16 @@ class Post(db.Model):  # type: ignore
     timestamp: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc), index=True)
     post: Mapped[str] = mapped_column(sa.String(200), nullable=True)
-    author: Mapped[User] = relationship(back_populates='posts')
+    likes: Mapped['Like'] = relationship(
+        'Like', backref='post', uselist=False)
+
+
+class Like(db.Model):  # type: ignore
+    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        sa.Integer, sa.ForeignKey(User.id), index=True)
+    post_id: Mapped[int] = mapped_column(
+        sa.Integer, sa.ForeignKey(Post.id), index=True)
 
 
 @login_manager.user_loader

@@ -12,11 +12,12 @@
         <p class="card-text mt-2 mb-2 ms-1">
             <span class="newline-text">{{ post.post }}</span>
         </p>
-        <p class="card-subtitle">
-            <small class="text-body-tertiary mb-2">{{ moment(post.timestamp).fromNow() }}</small>
+        <p class="card-subtitle mb-1">
+            <small class="text-body-tertiary">{{ moment(post.timestamp).fromNow() }}</small>
         </p>
-        <a href="#" class="card-link">✨ Aura ✨</a>
-        <a href="#" class="card-link">💥 Burn 💥</a>
+        <a href="#" class="card-link btn btn-sm rounded-5 btn-outline-warning" data-bs-toggle="button" data-bs-id="{{ post.id }}" onclick="likeButtonClicked(this)">
+            <span>✨ Aura ✨</span>
+        </a>
     </div>
 </div>
 {% endfor %}

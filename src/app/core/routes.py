@@ -1,8 +1,8 @@
 from os import path, remove
 
 import sqlalchemy as sa
-from flask import (flash, redirect, render_template, request, send_file,
-                   send_from_directory, url_for)
+from flask import (Response, flash, jsonify, redirect, render_template,
+                   request, send_file, send_from_directory, url_for)
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from is_safe_url import is_safe_url
@@ -46,28 +46,31 @@ def search() -> ResponseReturnValue:
 def post() -> ResponseReturnValue:
     post_form = PostForm()
     if post_form.validate_on_submit():
-        post = Post(user_id=current_user.id, post=post_form.post.data, author=current_user)
+        post = Post(user_id=current_user.id,
+                    post=post_form.post.data, author=current_user)
         db.session.add(post)
         db.session.commit()
-    
+
     elif post_form.errors:
-        for field, errors in post_form.errors.items(): 
-            for error in errors: flash(f'{field.capitalize()}: {error}', category='danger')
-    
+        for field, errors in post_form.errors.items():
+            for error in errors:
+                flash(f'{field.capitalize()}: {error}', category='danger')
+
     next_page = request.referrer
     if next_page is not None and is_safe_url(next_page, {request.host}):
         return redirect(next_page)
     return redirect(url_for('.feed'))
-    
-    
+
+
 @core.route('/profile/<username>')
 @login_required
 def profile(username: str) -> ResponseReturnValue:
     profile_form = EditProfileForm()
     user = User.query.filter_by(username=username).first_or_404()
     profile_form.bio.data = user.bio
-    posts = Post.query.filter_by(user_id = user.id).order_by(sa.desc(Post.timestamp))
-    
+    posts = Post.query.filter_by(
+        user_id=user.id).order_by(sa.desc(Post.timestamp))
+
     return render_template('core/profile.html', user=user, posts=posts, profile_form=profile_form)
 
 
@@ -91,9 +94,10 @@ def edit_profile() -> ResponseReturnValue:
             profile_imgs.save(img, name=name)  # type: ignore
             flash('Profile picture updated!', category='success')
     elif profile_form.errors:
-        for field, errors in profile_form.errors.items(): 
-            for error in errors: flash(f'{field.capitalize()}: {error}', category='danger')
-    
+        for field, errors in profile_form.errors.items():
+            for error in errors:
+                flash(f'{field.capitalize()}: {error}', category='danger')
+
     return redirect(url_for('.profile', username=current_user.username))
 
 
@@ -107,3 +111,44 @@ def profile_pic(username: str) -> ResponseReturnValue:
     if path.exists(img_path):
         return send_file(img_path)
     return send_from_directory('static', 'images/default_pfp.webp')
+
+
+@core.route('/add_like', methods=['POST'])
+def like_post() -> Response:
+    data = request.json
+    if not data or 'post_id' not in data:
+        return Response(
+            response=jsonify({'status': 'error', 'message': 'Invalid request'}).get_data(
+                as_text=True),
+            status=400,
+            mimetype='application/json'
+        )
+
+    try:
+        post_id = int(data['post_id'])
+    except (ValueError, TypeError):
+        return Response(
+            response=jsonify({'status': 'error', 'message': 'Invalid post ID'}).get_data(
+                as_text=True),
+            status=400,
+            mimetype='application/json'
+        )
+
+    post = Post.query.filter_by(id=post_id).first()
+    if post is None:
+        return Response(
+            response=jsonify({'status': 'error', 'message': 'Post not found'}).get_data(
+                as_text=True),
+            status=404,
+            mimetype='application/json'
+        )
+
+    current_user.add_like(post)
+    db.session.commit()
+
+    return Response(
+        response=jsonify(
+            {'status': 'success', 'message': 'Like added successfully'}).get_data(as_text=True),
+        status=200,
+        mimetype='application/json'
+    )
