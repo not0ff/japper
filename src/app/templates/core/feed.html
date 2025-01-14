@@ -5,7 +5,12 @@
 {% endblock %}
 
 {% block main %}
-    {% with posts = posts, posts_title=feed_title %}
-        {% include "core/render_posts.html" %}
-    {% endwith %}
+    <p class="h2 text-body-secondary">{{ feed_title }}</p>
+    {% for post in posts %}
+        {% include "components/post.html" %}
+    {% endfor %}
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/post_funcs.js') }}"></script>
 {% endblock %}

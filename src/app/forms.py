@@ -1,7 +1,6 @@
 from typing import Optional
 
 from filetype import guess_extension
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileSize
 from wtforms import (BooleanField, Field, PasswordField, StringField,

@@ -1,0 +1,23 @@
+<div class="post card mb-3" id="{{ post.id }}">
+    <div class="card-body">
+        <a class="h5 card-title text-decoration-none" href="{{ url_for('core.profile', username=post.author.username) }}">
+            <img class="profile-pic-small rounded-circle img-thumbnail" src="{{ url_for('core.profile_pic', username=post.author.username) }}" alt="Profile picture">
+            <span>{{ post.author.username }}</span>
+        </a>
+        <p class="card-text mt-2 mb-2 ms-1">
+            <span class="newline-text">{{ post.post }}</span>
+        </p>
+        <p class="card-subtitle mb-1">
+            <small class="text-body-tertiary">{{ moment(post.timestamp).fromNow(refresh=True) }}</small>
+        </p>
+        {% if post.liked %}
+        <a href="#" class="card-link btn btn-sm rounded-5 btn-outline-warning like-btn active" aria-pressed="true" data-bs-toggle="button" data-bs-id="{{ post.id }}" onclick="likeButtonClicked(this)">
+            <span>✨ {{ post.likes|count }} Aura ✨</span>
+        </a>
+        {% else %}
+        <a href="#" class="card-link btn btn-sm rounded-5 btn-outline-warning like-btn" data-bs-toggle="button" data-bs-id="{{ post.id }}" onclick="likeButtonClicked(this)">
+            <span>✨ {{ post.likes|count }} Aura ✨</span>
+        </a>
+        {% endif %}
+    </div>
+</div>

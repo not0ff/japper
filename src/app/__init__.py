@@ -28,13 +28,12 @@ def create_app(config_class=Config) -> Flask:
     from app.auth import auth
     app.register_blueprint(auth)
     
+    from app.api import api
+    app.register_blueprint(api)
+    
     @app.context_processor
     def pass_post_form() -> Dict[str, PostForm]:
         return {'post_form': PostForm()}
-    
-    @app.template_filter()
-    def format_datetime(timestamp: datetime) -> str:
-        return datetime.strftime(timestamp, '%b %-d, %Y')
 
     @app.after_request
     def add_header(request: Request) -> Request:

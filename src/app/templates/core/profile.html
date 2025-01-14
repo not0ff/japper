@@ -34,9 +34,10 @@
             </div>
         </div>
     </div>
-    {% with posts = posts, posts_title='User\'s posts' %}
-        {% include "core/render_posts.html" %}
-    {% endwith %}
+    <p class="h2 text-body-secondary">User's posts</p>
+    {% for post in posts %}
+        {% include "components/post.html" %}
+    {% endfor %}
 {% endblock %}
 
 {% if user == current_user %}
@@ -71,5 +72,15 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        document.getElementById("saveButton").addEventListener("click", function () {
+            let profile_form = document.getElementById("editProfileForm");
+            profile_form.submit();
+        });
+    </script>
+    <script src="{{ url_for('static', filename='js/post_funcs.js') }}"></script>
 {% endblock %}
 {% endif %}

@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Literal, Optional, Union
 
 import sqlalchemy as sa
-from sqlalchemy.orm import mapped_column, relationship, backref, Mapped
 from flask_login import UserMixin
+from sqlalchemy.orm import Mapped, backref, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db, login_manager
@@ -35,17 +35,15 @@ class User(UserMixin, db.Model):  # type: ignore
             db.session.add(like)
 
     def remove_like(self, post: 'Post') -> None:
-        if self.is_liked(post):
-            Like.query.filter_by(
-                user_id=self.id,
-                post_id=post.id
-            ).delete()
+        if (like := self.is_liked(post)):
+            db.session.delete(like)
 
-    def is_liked(self, post: 'Post') -> bool:
-        return Like.query.filter_by(
+    def is_liked(self, post: 'Post') -> Union['Like', Literal[False]]:
+        like = Like.query.filter_by(
             user_id=self.id,
             post_id=post.id
-        ).first() is not None
+        ).first()
+        return like if like is not None else False
 
 
 class Post(db.Model):  # type: ignore
