@@ -18,21 +18,23 @@ function likeButtonClicked(button) {
     let postId = button.getAttribute("data-bs-id");
     let csrfToken = document.getElementById('csrf_token').value;
 
-    if (button.classList.contains('active')) {
-        fetch('/add_like', {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json; charset=UTF-8",
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                post_id: postId
-              }),
-            credentials: 'include',
-        })
+    let actionEndpoint = '/add_like';
+    if (!button.classList.contains('active')) {
+        actionEndpoint = '/remove_like';
+    }
+
+    fetch(actionEndpoint, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            post_id: postId
+        }),
+        credentials: 'include',
+    })
         .then((response) => response.json())
         .then((json) => console.log(json));
-    } else {
-        console.log("...");
-    }
+    location.reload(true);
 }

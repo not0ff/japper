@@ -55,8 +55,9 @@ class Post(db.Model):  # type: ignore
     timestamp: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc), index=True)
     post: Mapped[str] = mapped_column(sa.String(200), nullable=True)
-    likes: Mapped['Like'] = relationship(
-        'Like', backref='post', uselist=False)
+    likes: Mapped[list['Like']] = relationship(
+        'Like', backref=backref('post'), uselist=True, lazy='select'
+    )
 
 
 class Like(db.Model):  # type: ignore

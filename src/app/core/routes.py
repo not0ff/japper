@@ -24,7 +24,9 @@ def index() -> ResponseReturnValue:
 @core.route('/feed/')
 @login_required
 def feed() -> ResponseReturnValue:
-    posts = Post.query.order_by(sa.desc(Post.timestamp))
+    posts = list(Post.query.order_by(sa.desc(Post.timestamp)))
+    for post in posts:
+        post.liked = True if current_user.id in [like.user_id for like in post.likes] else False
     return render_template('core/feed.html', posts=posts, feed_title='Feed')
 
 
@@ -32,6 +34,8 @@ def feed() -> ResponseReturnValue:
 @login_required
 def newest() -> ResponseReturnValue:
     posts = Post.query.order_by(sa.desc(Post.timestamp))
+    for post in posts:
+        post.liked = True if current_user.id in [like.user_id for like in post.likes] else False
     return render_template('core/feed.html', posts=posts, feed_title='Newest posts')
 
 
@@ -149,6 +153,46 @@ def like_post() -> Response:
     return Response(
         response=jsonify(
             {'status': 'success', 'message': 'Like added successfully'}).get_data(as_text=True),
+        status=200,
+        mimetype='application/json'
+    )
+
+@core.route('/remove_like', methods=['POST'])
+def remove_post() -> Response:
+    data = request.json
+    if not data or 'post_id' not in data:
+        return Response(
+            response=jsonify({'status': 'error', 'message': 'Invalid request'}).get_data(
+                as_text=True),
+            status=400,
+            mimetype='application/json'
+        )
+
+    try:
+        post_id = int(data['post_id'])
+    except (ValueError, TypeError):
+        return Response(
+            response=jsonify({'status': 'error', 'message': 'Invalid post ID'}).get_data(
+                as_text=True),
+            status=400,
+            mimetype='application/json'
+        )
+
+    post = Post.query.filter_by(id=post_id).first()
+    if post is None:
+        return Response(
+            response=jsonify({'status': 'error', 'message': 'Post not found'}).get_data(
+                as_text=True),
+            status=404,
+            mimetype='application/json'
+        )
+
+    current_user.remove_like(post)
+    db.session.commit()
+
+    return Response(
+        response=jsonify(
+            {'status': 'success', 'message': 'Like removed successfully'}).get_data(as_text=True),
         status=200,
         mimetype='application/json'
     )
