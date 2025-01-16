@@ -1,8 +1,8 @@
 from os import path, remove
 
 import sqlalchemy as sa
-from flask import (Response, flash, jsonify, redirect, render_template,
-                   request, send_file, send_from_directory, url_for)
+from flask import (flash, redirect, render_template, request, send_file,
+                   send_from_directory, url_for)
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from is_safe_url import is_safe_url
@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from app.extensions import db, profile_imgs
 from app.forms import EditProfileForm, PostForm
 from app.models import Post, User
-from app.utils import optimize_img
+from app.utils import get_feed, optimize_img
 
 from . import core
 
@@ -24,20 +24,14 @@ def index() -> ResponseReturnValue:
 @core.route('/feed/')
 @login_required
 def feed() -> ResponseReturnValue:
-    posts = list(Post.query.order_by(sa.desc(Post.timestamp)))
-    for post in posts:
-        post.liked = True if current_user.id in [
-            like.user_id for like in post.likes] else False
+    posts = get_feed()
     return render_template('core/feed.html', posts=posts, feed_title='Feed')
 
 
 @core.route('/newest/')
 @login_required
 def newest() -> ResponseReturnValue:
-    posts = list(Post.query.order_by(sa.desc(Post.timestamp)))
-    for post in posts:
-        post.liked = True if current_user.id in [
-            like.user_id for like in post.likes] else False
+    posts = Post.query.order_by(sa.desc(Post.timestamp))
     return render_template('core/feed.html', posts=posts, feed_title='Newest posts')
 
 

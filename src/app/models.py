@@ -2,7 +2,8 @@ from datetime import datetime, timezone
 from typing import Literal, Optional, Union
 
 import sqlalchemy as sa
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, backref, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -18,8 +19,9 @@ class User(UserMixin, db.Model):  # type: ignore
         db.String(120), nullable=True)
     posts: Mapped['Post'] = relationship(
         'Post', backref=backref('author'))
-    likes: Mapped['Like'] = relationship(
-        'Like', backref=backref('user'))
+    likes: Mapped[list['Like']] = relationship(
+        'Like', backref=backref('user'), uselist=True, lazy='select'
+    )
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
@@ -30,20 +32,16 @@ class User(UserMixin, db.Model):  # type: ignore
         return check_password_hash(self.password_hash, password)
 
     def add_like(self, post: 'Post') -> None:
-        if not self.is_liked(post):
+        if not post.liked:
             like = Like(user_id=self.id, post_id=post.id)
             db.session.add(like)
 
     def remove_like(self, post: 'Post') -> None:
-        if (like := self.is_liked(post)):
-            db.session.delete(like)
-
-    def is_liked(self, post: 'Post') -> Union['Like', Literal[False]]:
-        like = Like.query.filter_by(
-            user_id=self.id,
-            post_id=post.id
-        ).first()
-        return like if like is not None else False
+        if post.liked:
+            Like.query.filter_by(
+                user_id=self.id,
+                post_id=post.id
+            ).delete()
 
 
 class Post(db.Model):  # type: ignore
@@ -56,6 +54,10 @@ class Post(db.Model):  # type: ignore
     likes: Mapped[list['Like']] = relationship(
         'Like', backref=backref('post'), uselist=True, lazy='select'
     )
+
+    @hybrid_property
+    def liked(self):
+        return set(current_user.likes) & set(self.likes)
 
 
 class Like(db.Model):  # type: ignore

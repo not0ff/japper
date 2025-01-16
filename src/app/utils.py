@@ -1,11 +1,12 @@
 from io import BytesIO
 from typing import Optional, Union
 
-from flask_login import current_user
+import sqlalchemy as sa
 from PIL import Image
 from werkzeug.datastructures import FileStorage
 
-from app.models import Post
+from app.extensions import db
+from app.models import Like, Post
 
 
 def optimize_img(image: FileStorage, resize: bool = False) -> FileStorage:
@@ -41,7 +42,20 @@ def get_post(json_req: Optional[dict]) -> tuple[int, Union[Post, str]]:
     if post is None:
         return 404, 'Post not found'
 
-    post.liked = True if current_user.id in [
-        like.user_id for like in post.likes] else False
-
     return 200, post
+
+
+def get_feed():
+    query = sa.select(Post, ((
+        sa.select(
+            sa.func.count())
+        .where(Like.post_id == Post.id)
+        .scalar_subquery() - 1) / ((
+            sa.func.strftime('%s', sa.func.now()) -
+            sa.func.strftime('%s', Post.timestamp)
+        ) + 1)
+    ).label('rank')
+    ).order_by(sa.literal_column('rank').desc())
+
+    posts = db.session.execute(query).scalars().all()
+    return posts
