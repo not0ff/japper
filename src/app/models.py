@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Literal, Optional, Union
+from typing import Optional
 
 import sqlalchemy as sa
 from flask_login import UserMixin, current_user
@@ -33,7 +33,7 @@ class User(UserMixin, db.Model):  # type: ignore
 
     def add_like(self, post: 'Post') -> None:
         if not post.liked:
-            like = Like(user_id=self.id, post_id=post.id)
+            like: Like = Like(user_id=self.id, post_id=post.id)
             db.session.add(like)
 
     def remove_like(self, post: 'Post') -> None:
@@ -48,9 +48,10 @@ class Post(db.Model):  # type: ignore
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
         sa.Integer, sa.ForeignKey(User.id), index=True)
+    content: Mapped[str] = mapped_column(sa.String(200), nullable=True)
     timestamp: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc), index=True)
-    post: Mapped[str] = mapped_column(sa.String(200), nullable=True)
+    edited: Mapped[bool] = mapped_column(sa.Boolean, default=False, onupdate=True)
     likes: Mapped[list['Like']] = relationship(
         'Like', backref=backref('post'), uselist=True, lazy='select'
     )

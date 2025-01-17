@@ -1,0 +1,27 @@
+<div class="modal fade" id="newPost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create new post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newPostForm" class="mx-auto" action="{{ url_for('core.post') }}" method="post" novalidate>
+                    {{ post_form.csrf_token }}
+                    <fieldset class="mt-2 mb-5">
+                            {{ post_form.content(class_="form-control", rows_="3", placeholder_="What do you think?") }}
+                            <div class="form-text">
+                                {{ post_form.content.description }}
+                            </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                {{ post_form.submit(class_="btn btn-primary", id_="postButton") }}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="modal fade" id="editPost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit your post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPostForm" class="mx-auto" action="{{ url_for('core.edit_post') }}" method="post" novalidate>
+                    {{ edit_post_form.csrf_token }}
+                    {{ edit_post_form.post_id(id_="postIdField")}}
+                    <fieldset class="mt-2 mb-5">
+                            {{ edit_post_form.content(class_="form-control", id_="postContentField", rows_="3", placeholder_="What do you think?") }}
+                            <div class="form-text">
+                                {{ edit_post_form.content.description }}
+                            </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                {{ edit_post_form.submit(class_="btn btn-success", id_="savePostButton") }}
+            </div>
+        </div>
+    </div>
+</div>

@@ -11,6 +11,10 @@
     {% endfor %}
 {% endblock %}
 
+{% block modal %}
+    {% include "components/edit_post.html" %}
+{% endblock %}
+
 {% block script %}
     <script src="{{ url_for('static', filename='js/post_funcs.js') }}"></script>
 {% endblock %}

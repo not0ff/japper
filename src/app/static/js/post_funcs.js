@@ -49,3 +49,11 @@ function likeButtonClicked(button) {
             refreshPost(postId);
         });
 }
+
+function editPostButtonClicked(button) {
+    const postId = button.getAttribute("data-bs-id");
+    const content = document.getElementById(postId).getElementsByClassName('post-content').item(0).textContent
+
+    document.getElementById('postIdField').value = postId;
+    document.getElementById('postContentField').value = content;
+}

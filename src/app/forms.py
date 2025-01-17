@@ -1,14 +1,13 @@
-from typing import Optional
-
 from filetype import guess_extension
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileSize
-from wtforms import (BooleanField, Field, PasswordField, StringField,
-                     SubmitField, TextAreaField)
+from wtforms import (BooleanField, Field, HiddenField, PasswordField,
+                     StringField, SubmitField, TextAreaField)
 from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
 
 from app.extensions import profile_imgs
-from app.models import User
+from app.models import Post, User
 
 
 class SignupForm(FlaskForm):
@@ -24,7 +23,7 @@ class SignupForm(FlaskForm):
     submit: SubmitField = SubmitField('Sign Up')
 
     def validate_username(self, username: Field) -> None:
-        user = User.query.filter_by(username=username.data).first()
+        user: User = User.query.filter_by(username=username.data).first()
         if user is not None:
             raise ValidationError('This username is already taken')
 
@@ -47,7 +46,7 @@ class EditProfileForm(FlaskForm):
         Length(max=120, message='You can use at most 120 characters')])
     submit: SubmitField = SubmitField('Save changes')
 
-    def validate_profile_img(self, img: Field) -> None:
+    def validate_image(self, img: Field) -> None:
         if not img.data:
             return
         ext = guess_extension(img.data)
@@ -56,8 +55,23 @@ class EditProfileForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    post: TextAreaField = TextAreaField('Post', 
+    content: TextAreaField = TextAreaField('Content', 
         description= '200 character limit applies',validators=[
         DataRequired('Provide your post content'),
         Length(max=200, message='Your post cannot use more than 200 characters')])
     submit: SubmitField = SubmitField('Publish')
+
+class EditPostForm(FlaskForm):
+    content: TextAreaField = TextAreaField('Content', 
+        description= '200 character limit applies',validators=[
+        DataRequired('Provide your post content'),
+        Length(max=200, message='Your post cannot use more than 200 characters')])
+    post_id: HiddenField = HiddenField('PostId', validators=[
+        DataRequired('PostId is required')
+    ])
+    submit: SubmitField = SubmitField('Publish')
+    
+    def validate_post_id(self, post_id: Field) -> None:
+        post: Post = Post.query.filter_by(id=post_id.data, user_id=current_user.id).first()  
+        if post is None:
+            raise ValidationError('Invalid PostId')

@@ -1,4 +1,5 @@
 from os import path, remove
+from typing import Sequence
 
 import sqlalchemy as sa
 from flask import (flash, redirect, render_template, request, send_file,
@@ -9,7 +10,7 @@ from is_safe_url import is_safe_url
 from werkzeug.utils import secure_filename
 
 from app.extensions import db, profile_imgs
-from app.forms import EditProfileForm, PostForm
+from app.forms import EditPostForm, EditProfileForm, PostForm
 from app.models import Post, User
 from app.utils import get_feed, optimize_img
 
@@ -24,14 +25,14 @@ def index() -> ResponseReturnValue:
 @core.route('/feed/')
 @login_required
 def feed() -> ResponseReturnValue:
-    posts = get_feed()
+    posts: Sequence[Post] = get_feed()
     return render_template('core/feed.html', posts=posts, feed_title='Feed')
 
 
 @core.route('/newest/')
 @login_required
 def newest() -> ResponseReturnValue:
-    posts = Post.query.order_by(sa.desc(Post.timestamp))
+    posts: Sequence[Post] = Post.query.order_by(sa.desc(Post.timestamp))
     return render_template('core/feed.html', posts=posts, feed_title='Newest posts')
 
 
@@ -44,10 +45,10 @@ def search() -> ResponseReturnValue:
 @core.route('/post/', methods=['POST'])
 @login_required
 def post() -> ResponseReturnValue:
-    post_form = PostForm()
+    post_form: PostForm = PostForm()
     if post_form.validate_on_submit():
-        post = Post(user_id=current_user.id,
-                    post=post_form.post.data)
+        post: Post = Post(user_id=current_user.id,
+                    content=post_form.content.data)
         db.session.add(post)
         db.session.commit()
 
@@ -62,21 +63,42 @@ def post() -> ResponseReturnValue:
     return redirect(url_for('.feed'))
 
 
+@core.route('/post/edit/', methods=['POST'])
+@login_required
+def edit_post() -> ResponseReturnValue:
+    edit_post_form: EditPostForm = EditPostForm()
+    if edit_post_form.validate_on_submit():
+        post: Post = Post.query.filter_by(id=edit_post_form.post_id.data, user_id=current_user.id)
+        post.update({Post.content: edit_post_form.content.data})
+        
+        db.session.commit()
+    
+    elif edit_post_form.errors:
+        for field, errors in edit_post_form.errors.items():
+            for error in errors:
+                flash(f'{field.capitalize()}: {error}', category='danger')
+
+    next_page = request.referrer
+    if next_page is not None and is_safe_url(next_page, {request.host}):
+        return redirect(next_page)
+    return redirect(url_for('.feed'))
+
+
 @core.route('/profile/<username>')
 @login_required
 def profile(username: str) -> ResponseReturnValue:
-    profile_form = EditProfileForm()
-    user = User.query.filter_by(username=username).first_or_404()
-    profile_form.bio.data = user.bio
-    posts = Post.query.filter_by(
+    profile_form: EditProfileForm = EditProfileForm()
+    user: User = User.query.filter_by(username=username).first_or_404()
+    posts: Sequence[Post] = Post.query.filter_by(
         user_id=user.id).order_by(sa.desc(Post.timestamp))
-
+    
+    profile_form.bio.data = user.bio
     return render_template('core/profile.html', user=user, posts=posts, profile_form=profile_form)
 
 
 @core.route('/profile/edit/', methods=['POST'])
 def edit_profile() -> ResponseReturnValue:
-    profile_form = EditProfileForm()
+    profile_form: EditProfileForm = EditProfileForm()
     if profile_form.validate_on_submit():
         if profile_form.bio.data != current_user.bio and profile_form.bio.data:
             current_user.bio = profile_form.bio.data
@@ -104,7 +126,7 @@ def edit_profile() -> ResponseReturnValue:
 @core.route('/serve/pfp/<username>')
 @login_required
 def profile_pic(username: str) -> ResponseReturnValue:
-    user = User.query.filter_by(username=username).first_or_404()
+    user: User = User.query.filter_by(username=username).first_or_404()
     img_name = secure_filename(f'{user.id}_pfp.webp')
     img_path = profile_imgs.path(img_name)
 

@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Optional, Union
+from typing import Optional, Sequence, Union
 
 import sqlalchemy as sa
 from PIL import Image
@@ -38,15 +38,15 @@ def get_post(json_req: Optional[dict]) -> tuple[int, Union[Post, str]]:
     except (ValueError, TypeError):
         return 400, 'Invalid post ID'
 
-    post = Post.query.filter_by(id=post_id).first()
+    post: Post = Post.query.filter_by(id=post_id).first()
     if post is None:
         return 404, 'Post not found'
 
     return 200, post
 
 
-def get_feed():
-    query = sa.select(Post, ((
+def get_feed() -> Sequence[Post]:
+    query: sa.Select = sa.select(Post, ((
         sa.select(
             sa.func.count())
         .where(Like.post_id == Post.id)
@@ -57,5 +57,4 @@ def get_feed():
     ).label('rank')
     ).order_by(sa.literal_column('rank').desc())
 
-    posts = db.session.execute(query).scalars().all()
-    return posts
+    return db.session.execute(query).scalars().all()

@@ -8,3 +8,8 @@ document.getElementById("postButton").addEventListener("click", function () {
     let post_form = document.getElementById("newPostForm");
     post_form.submit();
 });
+
+document.getElementById("savePostButton").addEventListener("click", function () {
+    const editPostForm = document.getElementById("editPostForm");
+    editPostForm.submit();
+});
