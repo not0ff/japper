@@ -10,7 +10,7 @@ from is_safe_url import is_safe_url
 from werkzeug.utils import secure_filename
 
 from app.extensions import db, profile_imgs
-from app.forms import EditPostForm, EditProfileForm, PostForm
+from app.forms import EditPostForm, EditProfileForm, PostForm, DeletePostForm
 from app.models import Post, User
 from app.utils import get_feed, optimize_img
 
@@ -75,6 +75,26 @@ def edit_post() -> ResponseReturnValue:
     
     elif edit_post_form.errors:
         for field, errors in edit_post_form.errors.items():
+            for error in errors:
+                flash(f'{field.capitalize()}: {error}', category='danger')
+
+    next_page = request.referrer
+    if next_page is not None and is_safe_url(next_page, {request.host}):
+        return redirect(next_page)
+    return redirect(url_for('.feed'))
+
+
+@core.route('/post/delete/', methods=['POST'])
+@login_required
+def delete_post() -> ResponseReturnValue:
+    delete_post_form: DeletePostForm = DeletePostForm()
+    if delete_post_form.validate_on_submit():
+        post: Post = Post.query.filter_by(id=delete_post_form.post_id.data, user_id=current_user.id).first_or_404()
+        
+        db.session.delete(post)
+        db.session.commit()
+    elif delete_post_form.errors:
+        for field, errors in delete_post_form.errors.items():
             for error in errors:
                 flash(f'{field.capitalize()}: {error}', category='danger')
 

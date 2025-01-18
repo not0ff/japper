@@ -10,6 +10,12 @@ from app.extensions import profile_imgs
 from app.models import Post, User
 
 
+def validate_post_id(form: FlaskForm, field: Field) -> None:
+    post: Post = Post.query.filter_by(id=field.data, user_id=current_user.id).first()  
+    if post is None:
+        raise ValidationError('Invalid PostId')
+
+
 class SignupForm(FlaskForm):
     username: StringField = StringField('Username', validators=[
         DataRequired(message='Enter a username'),
@@ -61,17 +67,20 @@ class PostForm(FlaskForm):
         Length(max=200, message='Your post cannot use more than 200 characters')])
     submit: SubmitField = SubmitField('Publish')
 
+
 class EditPostForm(FlaskForm):
     content: TextAreaField = TextAreaField('Content', 
         description= '200 character limit applies',validators=[
         DataRequired('Provide your post content'),
         Length(max=200, message='Your post cannot use more than 200 characters')])
     post_id: HiddenField = HiddenField('PostId', validators=[
-        DataRequired('PostId is required')
-    ])
-    submit: SubmitField = SubmitField('Publish')
-    
-    def validate_post_id(self, post_id: Field) -> None:
-        post: Post = Post.query.filter_by(id=post_id.data, user_id=current_user.id).first()  
-        if post is None:
-            raise ValidationError('Invalid PostId')
+        DataRequired('PostId is required'),
+        validate_post_id])
+    submit: SubmitField = SubmitField('Save')
+
+
+class DeletePostForm(FlaskForm):
+    post_id: HiddenField = HiddenField('PostId', validators=[
+        DataRequired('PostId is required'),
+        validate_post_id])
+    submit: SubmitField = SubmitField('Delete')

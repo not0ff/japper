@@ -18,7 +18,7 @@
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <a href="#" class="dropdown-item link-danger">Delete</a>
+                        <a href="#" class="dropdown-item link-danger" data-bs-toggle="modal" data-bs-target="#deletePost" data-bs-id="{{ post.id }}" onclick="deletePostButtonClicked(this)">Delete</a>
                     </li>
                     {% else %}
                     <li>

@@ -6,7 +6,7 @@ from flask_uploads import configure_uploads
 
 from app.extensions import (csrf, db, login_manager, migrate, moment, session,
                             uploads)
-from app.forms import EditPostForm, PostForm
+from app.forms import EditPostForm, PostForm, DeletePostForm
 from config import Config
 
 
@@ -33,7 +33,7 @@ def create_app(config_class=Config) -> Flask:
 
     @app.context_processor
     def pass_post_form() -> Dict[str, PostForm]:
-        return {'post_form': PostForm(), 'edit_post_form': EditPostForm()}
+        return {'post_form': PostForm(), 'edit_post_form': EditPostForm(), 'delete_post_form': DeletePostForm()}
 
     @app.after_request
     def add_header(request: Request) -> Request:

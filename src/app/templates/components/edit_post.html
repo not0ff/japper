@@ -8,7 +8,7 @@
             <div class="modal-body">
                 <form id="editPostForm" class="mx-auto" action="{{ url_for('core.edit_post') }}" method="post" novalidate>
                     {{ edit_post_form.csrf_token }}
-                    {{ edit_post_form.post_id(id_="postIdField")}}
+                    {{ edit_post_form.post_id(id_="editPostIdField")}}
                     <fieldset class="mt-2 mb-5">
                             {{ edit_post_form.content(class_="form-control", id_="postContentField", rows_="3", placeholder_="What do you think?") }}
                             <div class="form-text">

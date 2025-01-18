@@ -54,6 +54,11 @@ function editPostButtonClicked(button) {
     const postId = button.getAttribute("data-bs-id");
     const content = document.getElementById(postId).getElementsByClassName('post-content').item(0).textContent
 
-    document.getElementById('postIdField').value = postId;
+    document.getElementById('editPostIdField').value = postId;
     document.getElementById('postContentField').value = content;
+}
+
+function deletePostButtonClicked(button) {
+    const postId = button.getAttribute("data-bs-id");
+    document.getElementById('deletePostIdField').value = postId;
 }

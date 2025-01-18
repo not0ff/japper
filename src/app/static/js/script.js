@@ -13,3 +13,8 @@ document.getElementById("savePostButton").addEventListener("click", function () 
     const editPostForm = document.getElementById("editPostForm");
     editPostForm.submit();
 });
+
+document.getElementById("deletePostButton").addEventListener("click", function () {
+    const editPostForm = document.getElementById("deletePostForm");
+    editPostForm.submit();
+});

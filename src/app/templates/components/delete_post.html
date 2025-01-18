@@ -1,0 +1,21 @@
+<div class="modal fade" id="deletePost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title mx-auto">Do you want to delete this post?</h4>
+            </div>
+            <div class="modal-body">
+                <form id="deletePostForm" action="{{ url_for('core.delete_post') }}" method="post" novalidate>
+                    {{ delete_post_form.csrf_token }}
+                    {{ delete_post_form.post_id(id_="deletePostIdField") }}
+                </form>
+                <div class="float-end">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    {{ delete_post_form.submit(class_="btn btn-danger", id_="deletePostButton") }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
