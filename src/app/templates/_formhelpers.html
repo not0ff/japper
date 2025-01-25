@@ -1,7 +1,7 @@
 {% macro render_auth_field(field) %}
     <div class="form-floating mb-3">
-        {{ field(class_='form-control bg-secondary-subtle'+(' is-invalid' if field.errors else ''), placeholder_=field.name) }}
-        {{ field.label(class_='form-label') }}
+        {{ field(class_="form-control bg-secondary-subtle"+(" is-invalid" if field.errors else ""), placeholder_=field.name) }}
+        {{ field.label(class_="form-label") }}
         <div class="invalid-feedback">
         {% for error in field.errors %}
             <span>{{ error }}</span>
@@ -12,7 +12,7 @@
 
 {% macro render_checkbox(field) %}
     <div class="form-check mb-3">
-        {{ field(class_='form-check-input bg-secondary-subtle') }}
-        {{ field.label(class_='form-check-label') }}
+        {{ field(class_="form-check-input bg-secondary-subtle") }}
+        {{ field.label(class_="form-check-label") }}
     </div>
 {% endmacro %}

@@ -62,7 +62,7 @@ class EditProfileForm(FlaskForm):
 
 class PostForm(FlaskForm):
     content: TextAreaField = TextAreaField('Content', 
-        description= '200 character limit applies',validators=[
+        description='200 character limit applies',validators=[
         DataRequired('Provide your post content'),
         Length(max=200, message='Your post cannot use more than 200 characters')])
     submit: SubmitField = SubmitField('Publish')
@@ -70,7 +70,7 @@ class PostForm(FlaskForm):
 
 class EditPostForm(FlaskForm):
     content: TextAreaField = TextAreaField('Content', 
-        description= '200 character limit applies',validators=[
+        description='200 character limit applies', validators=[
         DataRequired('Provide your post content'),
         Length(max=200, message='Your post cannot use more than 200 characters')])
     post_id: HiddenField = HiddenField('PostId', validators=[
@@ -84,3 +84,11 @@ class DeletePostForm(FlaskForm):
         DataRequired('PostId is required'),
         validate_post_id])
     submit: SubmitField = SubmitField('Delete')
+    
+
+class SearchPostForm(FlaskForm):
+    query: StringField = StringField('Query',
+        description='Search up posts', validators=[
+        DataRequired('Provide searchable text'),
+        Length(min=3, max=200, message='Text for search must have %(min)d-%(max)d characters')])
+    submit: SubmitField = SubmitField('Search')

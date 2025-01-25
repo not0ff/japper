@@ -58,3 +58,8 @@ def get_feed() -> Sequence[Post]:
     ).order_by(sa.literal_column('rank').desc())
 
     return db.session.execute(query).scalars().all()
+
+
+def search_post(pattern: str) -> Sequence[Post]:
+    pattern = '%'.join(pattern.split())
+    return Post.query.filter(Post.content.like(f'%{pattern}%')).order_by(sa.desc(Post.timestamp)).all()

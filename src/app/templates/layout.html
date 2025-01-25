@@ -114,6 +114,8 @@
             {% block main %} {% endblock %}
         </main>
         {% include "components/new_post.html" %}
+        {% include "components/edit_post.html" %}
+        {% include "components/delete_post.html" %}
         {% block modal %}{% endblock %}
         {% block script %}{% endblock %}
         <script src="{{ url_for('static', filename='js/script.js') }}"></script>

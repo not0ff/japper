@@ -40,10 +40,8 @@
     {% endfor %}
 {% endblock %}
 
-{% if user == current_user %}
 {% block modal %}
     {% include "components/edit_profile.html" %}
-    {% include "components/edit_post.html" %}
 {% endblock %}
 
 {% block script %}
@@ -53,6 +51,4 @@
             profileForm.submit();
         });
     </script>
-    <script src="{{ url_for('static', filename='js/post_funcs.js') }}"></script>
 {% endblock %}
-{% endif %}

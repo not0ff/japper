@@ -20,8 +20,7 @@ class User(UserMixin, db.Model):  # type: ignore
     posts: Mapped['Post'] = relationship(
         'Post', backref=backref('author'))
     likes: Mapped[list['Like']] = relationship(
-        'Like', backref=backref('user'), uselist=True, lazy='select'
-    )
+        'Like', backref=backref('user'), uselist=True, lazy='select')
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
@@ -53,8 +52,7 @@ class Post(db.Model):  # type: ignore
         default=lambda: datetime.now(timezone.utc), index=True)
     edited: Mapped[bool] = mapped_column(sa.Boolean, default=False, onupdate=True)
     likes: Mapped[list['Like']] = relationship(
-        'Like', backref=backref('post'), uselist=True, lazy='select'
-    )
+        'Like', backref=backref('post'), uselist=True, lazy='select')
 
     @hybrid_property
     def liked(self):

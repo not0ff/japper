@@ -22,10 +22,10 @@
 .profile-pic {
     width: clamp(50px, 40vw, 200px);
     height: auto;
-}
+} 
 
 .profile-pic-small {
-    width: clamp(50px, 4vw, 75px);
+    width: clamp(40px, 4vw, 60px);
     height: auto;
 }
 

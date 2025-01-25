@@ -5,5 +5,32 @@
 {% endblock %}
 
 {% block main %}
-    Search page
+    <div class="container border rounded mt-2 mb-3 px-5 py-4">
+        <form class="d-flex justify-content-center" action="{{ url_for('.search') }}" method="post" novalidate>
+            {{ search_form.csrf_token }}
+            <div class="row">
+                <h2 class="text-center">{{ search_form.query.description }}</h2>
+                <div class="col-8 mt-2">
+                    {{ search_form.query(class_="form-control form-control-lg"+(" is-invalid" if search_form.query.errors else ""), placeholder_="Query") }}
+                    <div class="invalid-feedback">
+                        {% for error in search_form.query.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-4 mt-2">
+                    {{ search_form.submit(class_="btn btn-lg btn-primary") }}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if posts %}
+        <p class="h2 text-body-secondary">Found posts</p>
+        {% for post in posts %}
+            {% include "components/post.html" %}
+        {% endfor %}
+    {% elif search_form.validate_on_submit() %}
+        <p class="h2 text-body-secondary">No posts found</p>
+    {% endif %}
 {% endblock %}
