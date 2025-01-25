@@ -1,17 +1,16 @@
 from os import path, remove
 
-from flask import (Response, flash, jsonify, redirect, render_template,
-                   request, url_for)
+from flask import Response, flash, jsonify, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
-from is_safe_url import is_safe_url
 from werkzeug.utils import secure_filename
 
 from app import db
 from app.extensions import db, profile_imgs
-from app.forms import DeletePostForm, EditPostForm, EditProfileForm, PostForm
-from app.models import Post
-from app.utils import get_post, optimize_img
+from app.forms import (DeletePostForm, EditPostForm, EditProfileForm,
+                       FollowProfileForm, PostForm)
+from app.models import Post, User
+from app.utils import get_post, optimize_img, redirect_to_referrer, flash_form_errors
 
 from . import api
 
@@ -77,91 +76,100 @@ def remove_post() -> Response:
     )
 
 
-@api.route('/post/create', methods=['POST'])
+@api.route('/post/create/', methods=['POST'])
 @login_required
 def create_post() -> ResponseReturnValue:
-    post_form: PostForm = PostForm()
-    if post_form.validate_on_submit():
+    form: PostForm = PostForm()
+    if form.validate_on_submit():
         post: Post = Post(user_id=current_user.id,
-                          content=post_form.content.data)
+                          content=form.content.data)
         db.session.add(post)
         db.session.commit()
 
-    elif post_form.errors:
-        for field, errors in post_form.errors.items():
-            for error in errors:
-                flash(f'{field.capitalize()}: {error}', category='danger')
+    elif form.errors:
+        flash_form_errors(form)
 
-    next_page = request.referrer
-    if next_page is not None and is_safe_url(next_page, {request.host}):
-        return redirect(next_page)
-    return redirect(url_for('core.feed'))
-
+    return redirect_to_referrer()
 
 @api.route('/post/edit/', methods=['POST'])
 @login_required
 def edit_post() -> ResponseReturnValue:
-    edit_post_form: EditPostForm = EditPostForm()
-    if edit_post_form.validate_on_submit():
+    form: EditPostForm = EditPostForm()
+    if form.validate_on_submit():
         post: Post = Post.query.filter_by(
-            id=edit_post_form.post_id.data, user_id=current_user.id)
-        post.update({Post.content: edit_post_form.content.data})
+            id=form.post_id.data, user_id=current_user.id)
+        post.update({Post.content: form.content.data})
 
         db.session.commit()
+    elif form.errors:
+        flash_form_errors(form)
 
-    elif edit_post_form.errors:
-        for field, errors in edit_post_form.errors.items():
-            for error in errors:
-                flash(f'{field.capitalize()}: {error}', category='danger')
-
-    next_page = request.referrer
-    if next_page is not None and is_safe_url(next_page, {request.host}):
-        return redirect(next_page)
-    return redirect(url_for('core.feed'))
+    return redirect_to_referrer()
 
 
 @api.route('/post/delete/', methods=['POST'])
 @login_required
 def delete_post() -> ResponseReturnValue:
-    delete_post_form: DeletePostForm = DeletePostForm()
-    if delete_post_form.validate_on_submit():
+    form: DeletePostForm = DeletePostForm()
+    if form.validate_on_submit():
         post: Post = Post.query.filter_by(
-            id=delete_post_form.post_id.data, user_id=current_user.id).delete()
+            id=form.post_id.data, user_id=current_user.id).delete()
 
         db.session.commit()
-    elif delete_post_form.errors:
-        for field, errors in delete_post_form.errors.items():
-            for error in errors:
-                flash(f'{field.capitalize()}: {error}', category='danger')
+    elif form.errors:
+        flash_form_errors(form)
 
-    next_page = request.referrer
-    if next_page is not None and is_safe_url(next_page, {request.host}):
-        return redirect(next_page)
-    return redirect(url_for('core.feed'))
+    return redirect_to_referrer()
 
 
 @api.route('/profile/edit/', methods=['POST'])
 def edit_profile() -> ResponseReturnValue:
-    profile_form: EditProfileForm = EditProfileForm()
-    if profile_form.validate_on_submit():
-        if profile_form.bio.data != current_user.bio and profile_form.bio.data:
-            current_user.bio = profile_form.bio.data
+    form: EditProfileForm = EditProfileForm()
+    if form.validate_on_submit():
+        if form.bio.data != current_user.bio and form.bio.data:
+            current_user.bio = form.bio.data
             db.session.add(current_user)
             db.session.commit()
             flash('Profile bio changed', category='success')
 
-        if profile_form.image.data:
-            img = optimize_img(profile_form.image.data, resize=True)
+        if form.image.data:
+            img = optimize_img(form.image.data, resize=True)
             name = secure_filename(f'{current_user.id}_pfp.webp')
 
             if path.exists(img_path := profile_imgs.path(name)):
                 remove(img_path)
 
-            profile_imgs.save(img, name=name)  # type: ignore
+            profile_imgs.save(img, name=name)
             flash('Profile picture updated!', category='success')
-    elif profile_form.errors:
-        for field, errors in profile_form.errors.items():
-            for error in errors:
-                flash(f'{field.capitalize()}: {error}', category='danger')
+    elif form.errors:
+        flash_form_errors(form)
 
-    return redirect(url_for('core.profile', username=current_user.username))
+    return redirect_to_referrer()
+
+
+@api.route('/profile/follow', methods=['POST'])
+def follow_profile() -> ResponseReturnValue:
+    form: FollowProfileForm = FollowProfileForm()
+    if form.validate_on_submit():
+        user: User = User.query.filter_by(id = form.profile_id.data).first_or_404()
+        current_user.follow(user)
+        db.session.commit()
+
+    elif form.errors:
+        flash_form_errors(form)
+
+    return redirect_to_referrer(fallback=url_for('core.profile', username=current_user.username))
+
+
+@api.route('/profile/unfollow', methods=['POST'])
+def unfollow_profile() -> ResponseReturnValue:
+    form: FollowProfileForm = FollowProfileForm()
+    if form.validate_on_submit():
+        user: User = User.query.filter_by(id = form.profile_id.data).first_or_404()
+        current_user.unfollow(user)
+        db.session.commit()
+
+    elif form.errors:
+        flash_form_errors(form)
+
+    return redirect_to_referrer(fallback=url_for('core.profile', username=current_user.username))

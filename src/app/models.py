@@ -10,6 +10,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app.extensions import db, login_manager
 
 
+followers = sa.Table('followers',
+                     db.metadata,
+                     sa.Column('follower_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
+                     sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True)
+                    )
+
+
 class User(UserMixin, db.Model):  # type: ignore
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     username: Mapped[str] = mapped_column(
@@ -21,6 +28,20 @@ class User(UserMixin, db.Model):  # type: ignore
         'Post', backref=backref('author'))
     likes: Mapped[list['Like']] = relationship(
         'Like', backref=backref('user'), uselist=True, lazy='select')
+    following: Mapped[list['User']] = relationship(
+        'User', secondary=followers, 
+        primaryjoin=(followers.c.follower_id == id), 
+        secondaryjoin=(followers.c.followed_id == id),
+        back_populates='followers', uselist=True)
+    followers: Mapped[list['User']] = relationship(
+        'User', secondary=followers,
+        primaryjoin=(followers.c.followed_id == id),
+        secondaryjoin=(followers.c.follower_id == id),
+        back_populates='following', uselist=True)
+    
+    @hybrid_property
+    def followed(self):
+        return current_user in self.followers
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
@@ -41,6 +62,16 @@ class User(UserMixin, db.Model):  # type: ignore
                 user_id=self.id,
                 post_id=post.id
             ).delete()
+    
+    def follow(self, user: 'User') -> None:
+        if not user.followed:
+            self.following.append(user)
+            db.session.add(self)
+    
+    def unfollow(self, user: 'User') -> None:
+        if user.followed:
+            self.following.remove(user)
+            db.session.add(self)
 
 
 class Post(db.Model):  # type: ignore

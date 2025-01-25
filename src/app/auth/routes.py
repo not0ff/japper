@@ -1,11 +1,11 @@
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import flash, redirect, render_template, url_for
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required, login_user, logout_user
-from is_safe_url import is_safe_url
 
 from app import db
 from app.forms import LoginForm, SignupForm
 from app.models import User
+from app.utils import redirect_to_next
 
 from . import auth
 
@@ -23,11 +23,7 @@ def login() -> ResponseReturnValue:
             return redirect(url_for('.login'))
         login_user(user, remember=login_form.remember.data)
         
-        next_page = session.pop('next', None)
-        if next_page is not None and is_safe_url(next_page, {request.host}):
-            return redirect(next_page)
-        
-        return redirect(url_for('core.index'))
+        return redirect_to_next()
     return render_template('auth/login.html', login_form=login_form)
 
 

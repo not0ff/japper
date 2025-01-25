@@ -10,35 +10,52 @@ from app.extensions import profile_imgs
 from app.models import Post, User
 
 
+# Post Id of current user's post
 def validate_post_id(form: FlaskForm, field: Field) -> None:
     post: Post = Post.query.filter_by(id=field.data, user_id=current_user.id).first()  
     if post is None:
         raise ValidationError('Invalid PostId')
 
 
-class SignupForm(FlaskForm):
-    username: StringField = StringField('Username', validators=[
-        DataRequired(message='Enter a username'),
-        Length(min=3, max=16, message='Username must be between %(min)d and %(max)d characters long')])
-    password: PasswordField = PasswordField('Password', validators=[
-        DataRequired(message='Enter a password'),
-        Length(min=8, max=120, message='Password must have at least %(min)d characters')])
-    confirm_password: PasswordField = PasswordField('Repeat password', validators=[
-        DataRequired(message='Repeat your password'),
-        EqualTo('password', message='Passwords must be equal')])
-    submit: SubmitField = SubmitField('Sign Up')
+def validate_profile_id(form: FlaskForm, profile_id: Field) -> None:
+        user: User = User.query.filter_by(id = profile_id.data).first()
+        if user is None or user == current_user:
+            return ValidationError('Invalid ProfileId')
 
-    def validate_username(self, username: Field) -> None:
-        user: User = User.query.filter_by(username=username.data).first()
+
+def validate_username(form: FlaskForm, field: Field) -> None:
+        user: User = User.query.filter_by(username=field.data).first()
         if user is not None:
             raise ValidationError('This username is already taken')
 
 
+def validate_image(form: FlaskForm, field: Field) -> None:
+        if not field.data:
+            return
+        ext = guess_extension(field.data)
+        if ext is None or not profile_imgs.extension_allowed(ext):
+            raise ValidationError('Invalid image format')
+
+
+class SignupForm(FlaskForm):
+    username: StringField = StringField('Username', validators=[
+        DataRequired('Enter a username'),
+        Length(min=3, max=16, message='Username must be between %(min)d and %(max)d characters long'),
+        validate_username])
+    password: PasswordField = PasswordField('Password', validators=[
+        DataRequired('Enter a password'),
+        Length(min=8, max=120, message='Password must have at least %(min)d characters')])
+    confirm_password: PasswordField = PasswordField('Repeat password', validators=[
+        DataRequired('Repeat your password'),
+        EqualTo('password', message='Passwords must be equal')])
+    submit: SubmitField = SubmitField('Sign Up')
+    
+
 class LoginForm(FlaskForm):
     username: StringField = StringField('Username', validators=[
-        DataRequired(message='Enter a username')])
+        DataRequired('Enter a username')])
     password: PasswordField = PasswordField('Password', validators=[
-        DataRequired(message='Enter a password')])
+        DataRequired('Enter a password')])
     remember: BooleanField = BooleanField('Remember me')
     submit: SubmitField = SubmitField('Login')
 
@@ -46,25 +63,26 @@ class LoginForm(FlaskForm):
 class EditProfileForm(FlaskForm):
     image: FileField = FileField('Profile picture', validators=[
         FileAllowed(profile_imgs, message='Pick an image file!'),
-        FileSize(max_size=8*1024*1024, message='File is bigger than 8MB!')])
+        FileSize(max_size=8*1024*1024, message='File is bigger than 8MB!'),
+        validate_image])
     bio: TextAreaField = TextAreaField('Bio', 
         description='Use at most 120 characters', validators=[
         Length(max=120, message='You can use at most 120 characters')])
     submit: SubmitField = SubmitField('Save changes')
 
-    def validate_image(self, img: Field) -> None:
-        if not img.data:
-            return
-        ext = guess_extension(img.data)
-        if ext is None or not profile_imgs.extension_allowed(ext):
-            raise ValidationError('Invalid image format')
+
+class FollowProfileForm(FlaskForm):
+    profile_id: HiddenField = HiddenField('ProfileId', validators=[
+        DataRequired('ProfileId is required'),
+        validate_profile_id])
+    submit: SubmitField = SubmitField()
 
 
 class PostForm(FlaskForm):
     content: TextAreaField = TextAreaField('Content', 
         description='200 character limit applies',validators=[
         DataRequired('Provide your post content'),
-        Length(max=200, message='Your post cannot use more than 200 characters')])
+        Length(max=200, message='Your post cannot contain more than 200 characters')])
     submit: SubmitField = SubmitField('Publish')
 
 
