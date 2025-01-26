@@ -1,15 +1,19 @@
-<div class="post card mb-3" id="{{ post.id }}">
+<div class="post card mb-3 rounded-4" id="{{ post.id }}">
     <div class="card-body">
-        <div class="card-title d-flex justify-content-between flex-row">
+        <div class="card-title d-flex justify-content-between">
             <a class="h5 text-decoration-none" href="{{ url_for('core.profile', username=post.author.username) }}">
                 <img class="profile-pic-small rounded-circle img-thumbnail" src="{{ url_for('core.profile_pic', username=post.author.username) }}" alt="Profile picture">
+                {% if post.author.followed %}
+                <span>{{ post.author.username }} <i class="bi bi-person-check-fill"></i></span>
+                {% elif post.author == current_user %}
+                <span>{{ post.author.username }} <i class="bi bi-person-circle"></i></span>
+                {% else %}
                 <span>{{ post.author.username }}</span>
+                {% endif %}
             </a>
             <div class="dropdown">
-                <a href="#" role="button" data-bs-toggle="dropdown">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical text-white" viewBox="0 0 16 16">
-                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                    </svg>
+                <a href="#" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical text-white"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     {% if post.author == current_user %}
@@ -34,14 +38,13 @@
         <p class="card-subtitle mb-1">
             <small class="text-body-tertiary">{{ moment(post.timestamp).fromNow(refresh=True) }} {% if post.edited %}(edited){% endif %} </small>
         </p>
-        {% if post.liked %}
-        <a href="#" class="card-link btn btn-sm rounded-5 btn-outline-warning like-btn active" aria-pressed="true" data-bs-toggle="button" data-bs-id="{{ post.id }}" onclick="likeButtonClicked(this)">
-            <span>✨ {{ post.likes|count }} Aura ✨</span>
-        </a>
-        {% else %}
-        <a href="#" class="card-link btn btn-sm rounded-5 btn-outline-warning like-btn" data-bs-toggle="button" data-bs-id="{{ post.id }}" onclick="likeButtonClicked(this)">
-            <span>✨ {{ post.likes|count }} Aura ✨</span>
-        </a>
-        {% endif %}
+        <div class="d-flex justify-content-between">
+            <a href="#" class="card-link btn btn-sm rounded-5 btn-outline-warning like-btn {% if post.liked %}active{% endif %}" data-bs-toggle="button" aria-pressed="{{ 'true' if post.liked else 'false' }}" data-bs-id="{{ post.id }}" onclick="likeButtonClicked(this)">
+                <span>✨ {{ post.likes|count }} Aura ✨</span>
+            </a>
+            <button type="button" class="btn btn-link p-0" data-bs-id="{{ post.id }}" data-bs-list-type="likes" onclick="showUserList(this)">
+                <i class="bi bi-list-stars text-white"></i>
+            </button>
+        </div>
     </div>
 </div>

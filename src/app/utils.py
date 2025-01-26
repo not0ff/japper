@@ -10,7 +10,7 @@ from PIL import Image
 from werkzeug.datastructures import FileStorage
 
 from app.extensions import db
-from app.models import Like, Post
+from app.models import Like, Post, User
 
 
 def optimize_img(image: FileStorage, resize: bool = False) -> FileStorage:
@@ -33,12 +33,12 @@ def optimize_img(image: FileStorage, resize: bool = False) -> FileStorage:
     )
 
 
-def get_post(json_req: Optional[dict]) -> tuple[int, Union[Post, str]]:
-    if json_req is None or 'post_id' not in json_req:
+def get_post(data: Optional[dict]) -> tuple[int, Union[Post, str]]:
+    if data is None or 'id' not in data:
         return 400, 'Invalid request'
 
     try:
-        post_id = int(json_req['post_id'])
+        post_id = int(data['id'])
     except (ValueError, TypeError):
         return 400, 'Invalid post ID'
 
@@ -47,6 +47,22 @@ def get_post(json_req: Optional[dict]) -> tuple[int, Union[Post, str]]:
         return 404, 'Post not found'
 
     return 200, post
+
+
+def get_profile(data: Optional[dict]) -> tuple[int, Union[User, str]]:
+    if data is None or 'id' not in data:
+        return 400, 'Invalid request'
+    
+    try: 
+        user_id = int(data['id'])
+    except (ValueError, TypeError):
+        return 400, 'Invalid user ID'
+    
+    user: User = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return 404, 'User not found'
+    
+    return 200, user 
 
 
 def get_feed() -> Sequence[Post]:

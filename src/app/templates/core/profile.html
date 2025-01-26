@@ -21,11 +21,19 @@
         </div>
         <div class="row me-3">
             <div class="col">
-                <p class="h3 pt-2 flow-start">{{ user.username }}</p>
+                <p class="h3 pt-2 flow-start">
+                    {% if user.followed %}
+                    <span>{{ user.username }} <i class="bi bi-person-check-fill"></i></span>
+                    {% elif user == current_user %}
+                    <span>{{ user.username }} <i class="bi bi-person-circle"></i></span>
+                    {% else %}
+                    <span>{{ user.username }}</span>
+                    {% endif %}
+                </p>
             </div>
             <div class="col">
-                <p class="h5 text-end ">Followers: {{ user.followers|count }}</p>
-                <p class="h5 text-end">Following: {{ user.following|count }}</p>
+                <p class="h6 text-end pt-2"><a href="#" class="text-decoration-none text-white" data-bs-id="{{ user.id }}" data-bs-list-type="followers" onclick="showUserList(this)">Followers: {{ user.followers|count }}</a></p>
+                <p class="h6 text-end"><a href="#" class="text-decoration-none text-white" data-bs-id="{{ user.id }}" data-bs-list-type="following" onclick="showUserList(this)">Following: {{ user.following|count }}</a></p>
             </div>
         </div>
         <div class="row me-3">

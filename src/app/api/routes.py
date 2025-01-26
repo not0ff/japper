@@ -10,15 +10,20 @@ from app.extensions import db, profile_imgs
 from app.forms import (DeletePostForm, EditPostForm, EditProfileForm,
                        FollowProfileForm, PostForm)
 from app.models import Post, User
-from app.utils import get_post, optimize_img, redirect_to_referrer, flash_form_errors
+from app.utils import get_post, get_profile, optimize_img, redirect_to_referrer, flash_form_errors
 
 from . import api
 
 
-@api.route('/post/fetch', methods=['POST'])
+@api.route('/null', methods=['POST', 'GET'])
+def null() -> ResponseReturnValue:
+    return 'Invalid attribute for requested endpoint'
+
+
+@api.route('/post/fetch')
 @login_required
 def fetch_post() -> ResponseReturnValue:
-    status, resp = get_post(request.json)
+    status, resp = get_post(request.args.to_dict())
     if status != 200:
         return Response(
             response=jsonify(resp).get_data(
@@ -53,6 +58,25 @@ def like_post() -> Response:
     )
 
 
+@api.route('/post/get_likes')
+@login_required
+def get_likes() -> ResponseReturnValue:
+    status, resp = get_post(request.args.to_dict())
+    if status != 200:
+        return Response(
+            response=jsonify(resp).get_data(
+                as_text=True),
+            status=status,
+            mimetype='application/json'
+        )
+        
+    likes_users = None
+    if isinstance(resp, Post):
+        likes_users = [User.query.get(like.user_id) for like in resp.likes ]
+    
+    return render_template('components/user_list.html', users=likes_users)
+
+
 @api.route('/post/remove_like', methods=['POST'])
 @login_required
 def remove_post() -> Response:
@@ -76,7 +100,7 @@ def remove_post() -> Response:
     )
 
 
-@api.route('/post/create/', methods=['POST'])
+@api.route('/post/create', methods=['POST'])
 @login_required
 def create_post() -> ResponseReturnValue:
     form: PostForm = PostForm()
@@ -91,7 +115,7 @@ def create_post() -> ResponseReturnValue:
 
     return redirect_to_referrer()
 
-@api.route('/post/edit/', methods=['POST'])
+@api.route('/post/edit', methods=['POST'])
 @login_required
 def edit_post() -> ResponseReturnValue:
     form: EditPostForm = EditPostForm()
@@ -107,7 +131,7 @@ def edit_post() -> ResponseReturnValue:
     return redirect_to_referrer()
 
 
-@api.route('/post/delete/', methods=['POST'])
+@api.route('/post/delete', methods=['POST'])
 @login_required
 def delete_post() -> ResponseReturnValue:
     form: DeletePostForm = DeletePostForm()
@@ -122,7 +146,8 @@ def delete_post() -> ResponseReturnValue:
     return redirect_to_referrer()
 
 
-@api.route('/profile/edit/', methods=['POST'])
+@api.route('/profile/edit', methods=['POST'])
+@login_required
 def edit_profile() -> ResponseReturnValue:
     form: EditProfileForm = EditProfileForm()
     if form.validate_on_submit():
@@ -148,6 +173,7 @@ def edit_profile() -> ResponseReturnValue:
 
 
 @api.route('/profile/follow', methods=['POST'])
+@login_required
 def follow_profile() -> ResponseReturnValue:
     form: FollowProfileForm = FollowProfileForm()
     if form.validate_on_submit():
@@ -162,6 +188,7 @@ def follow_profile() -> ResponseReturnValue:
 
 
 @api.route('/profile/unfollow', methods=['POST'])
+@login_required
 def unfollow_profile() -> ResponseReturnValue:
     form: FollowProfileForm = FollowProfileForm()
     if form.validate_on_submit():
@@ -173,3 +200,41 @@ def unfollow_profile() -> ResponseReturnValue:
         flash_form_errors(form)
 
     return redirect_to_referrer(fallback=url_for('core.profile', username=current_user.username))
+
+
+@api.route('/profile/get_followers')
+@login_required
+def get_followers() -> ResponseReturnValue:
+    status, resp = get_profile(request.args.to_dict())
+    if status != 200:
+        return Response(
+            response=jsonify(resp).get_data(
+                as_text=True),
+            status=status,
+            mimetype='application/json'
+        )
+        
+    followers = None
+    if isinstance(resp, User):
+        followers = resp.followers
+    
+    return render_template('components/user_list.html', users=followers)
+
+
+@api.route('/profile/get_following')
+@login_required
+def get_following() -> ResponseReturnValue:
+    status, resp = get_profile(request.args.to_dict())
+    if status != 200:
+        return Response(
+            response=jsonify(resp).get_data(
+                as_text=True),
+            status=status,
+            mimetype='application/json'
+        )
+        
+    followers = None
+    if isinstance(resp, User):
+        followers = resp.following
+    
+    return render_template('components/user_list.html', users=followers)

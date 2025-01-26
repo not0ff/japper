@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main %}
-    <div class="container border rounded mt-2 mb-3 px-5 py-4">
+    <div class="container border rounded-4 mt-2 mb-3 px-5 py-4">
         <form class="d-flex justify-content-center" action="{{ url_for('.search') }}" method="post" novalidate>
             {{ search_form.csrf_token }}
             <div class="row">
