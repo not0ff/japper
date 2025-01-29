@@ -1,4 +1,4 @@
-from typing import Dict
+from datetime import datetime, timezone
 
 from flask import Flask
 from flask.wrappers import Request
@@ -6,7 +6,7 @@ from flask_uploads import configure_uploads
 
 from app.extensions import (csrf, db, login_manager, migrate, moment, session,
                             uploads)
-from app.forms import EditPostForm, PostForm, DeletePostForm
+from app.forms import DeletePostForm, EditPostForm, PostForm
 from config import Config
 
 
@@ -28,11 +28,21 @@ def create_app(config_class=Config) -> Flask:
     from app.auth import auth
     app.register_blueprint(auth)
 
-    from app.api import api
-    app.register_blueprint(api)
+    from app.post import post
+    app.register_blueprint(post)
+
+    from app.profile import profile
+    app.register_blueprint(profile)
+
+    from app.notification import notification
+    app.register_blueprint(notification)
+
+    @app.template_filter()
+    def timestamp_to_datetime(timestamp):
+        return datetime.fromtimestamp(timestamp, timezone.utc)
 
     @app.context_processor
-    def pass_post_form() -> Dict[str, PostForm]:
+    def pass_post_form() -> dict[str, PostForm]:
         return {'post_form': PostForm(), 'edit_post_form': EditPostForm(), 'delete_post_form': DeletePostForm()}
 
     @app.after_request

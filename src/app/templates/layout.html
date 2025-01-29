@@ -63,17 +63,22 @@
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a href="{{ url_for('core.profile', username=current_user.username) }}" class="nav-link dropdown-toggle fw-semibold" role="button" data-bs-toggle="dropdown">
-                                Profile
+                            <a href="{{ url_for('profile.profile_page', username=current_user.username) }}" class="nav-link dropdown-toggle fw-semibold" role="button" data-bs-toggle="dropdown">
+                                {{ current_user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end position-absolute">
                                 <li>
                                     <h6 class="dropdown-header">User menu</h6>
                                 </li>
                                 <li>
-                                    <a href="{{ url_for('core.profile', username=current_user.username) }}" class="dropdown-item fw-semibold">
-                                        {{ current_user.username }}
+                                    <a href="{{ url_for('profile.profile_page', username=current_user.username) }}" class="dropdown-item fw-semibold">
+                                        Profile
                                     </a>
+                                </li>
+                                <li>
+                                    <button type="button" class="btn btn-link p-0" onclick="getAllNotifications()">
+                                        <span class="dropdown-item fw-semibold">Notifications</span>
+                                    </button>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li>
@@ -116,12 +121,22 @@
         <main class="container-flex d-flex flex-column justify-content-evenly align-items-center">
             {% block main %} {% endblock %}
         </main>
-        {% include "components/new_post.html" %}
-        {% include "components/edit_post.html" %}
-        {% include "components/delete_post.html" %}
-        {% include "components/show_users.html" %}
+        <div class="toast-container position-fixed bottom-0 start-0 p-3" id="notificationContainer"></div>
+        {% if current_user.is_authenticated %}
+            {% include "post/new_post.html" %}
+            {% include "post/edit_post.html" %}
+            {% include "post/delete_post.html" %}
+            {% include "components/show_users.html" %}
+            <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+        {% endif %}
         {% block modal %}{% endblock %}
         {% block script %}{% endblock %}
-        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+        <script>
+            document.querySelectorAll("ul.navbar-nav a.nav-link").forEach(function (link) {
+                if (link.href === window.location.href) {
+                    link.classList.add("active");
+                }
+            });
+        </script>
     </body>
 </html>

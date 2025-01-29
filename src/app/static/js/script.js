@@ -1,9 +1,3 @@
-document.querySelectorAll("ul.navbar-nav a.nav-link").forEach(function (link) {
-    if (link.href === window.location.href) {
-        link.classList.add("active");
-    }
-});
-
 document.getElementById("postButton").addEventListener("click", function () {
     let post_form = document.getElementById("newPostForm");
     post_form.submit();
@@ -24,8 +18,6 @@ document
     });
 
 function fetchPost(postId) {
-    const csrfToken = document.getElementById("csrf_token").value;
-
     return fetch(
         "/post/fetch?" +
             new URLSearchParams({
@@ -35,7 +27,6 @@ function fetchPost(postId) {
             method: "GET",
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
-                "X-CSRFToken": csrfToken,
             },
         }
     ).then((response) => {
@@ -89,7 +80,6 @@ function deletePostButtonClicked(button) {
 function showUserList(element) {
     const userId = element.getAttribute("data-bs-id");
     const listType = element.getAttribute("data-bs-list-type");
-    const csrfToken = document.getElementById("csrf_token").value;
 
     let actionEndpoint = "/null";
     let listTitle = "User list";
@@ -117,7 +107,6 @@ function showUserList(element) {
             method: "GET",
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
-                "X-CSRFToken": csrfToken,
             },
         }
     )
@@ -130,3 +119,86 @@ function showUserList(element) {
             new bootstrap.Modal(modal).show();
         });
 }
+
+function showNotifications(notifications) {
+    const notificationContainer = document.getElementById(
+        "notificationContainer"
+    );
+
+    notificationContainer.innerHTML = "";
+    notifications.forEach((notification) => {
+        const content = notificationContainer.innerHTML;
+        notificationContainer.innerHTML = content + notification;
+    });
+
+    let delay = 5000 + 500 * notifications.length;
+    notificationContainer
+        .querySelectorAll(".notification")
+        .forEach((notification) => {
+            const notificationToast = bootstrap.Toast.getOrCreateInstance(
+                notification,
+                { delay: delay }
+            );
+            notificationToast.show();
+            delay -= 500;
+        });
+    flask_moment_render_all();
+}
+
+function getAllNotifications(unread_only = false, autoread = true) {
+    fetch(
+        "/notification/get?" +
+            new URLSearchParams({
+                unread_only: unread_only,
+                autoread: autoread,
+            }).toString(),
+        {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+            },
+        }
+    )
+        .then((response) => response.json())
+        .then((notificationList) => showNotifications(notificationList));
+}
+
+function get_timestamp() {
+    return Math.floor(new Date().getTime() / 1000);
+}
+
+function notificationUpdates() {
+    let timestamp = get_timestamp();
+
+    setInterval(function () {
+        fetch(
+            "/notification/get?" +
+                new URLSearchParams({
+                    since: timestamp,
+                    unread_only: true,
+                    autoread: true,
+                }).toString(),
+            {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                },
+            }
+        )
+            .then((response) => response.json())
+            .then((notificationList) => {
+                if (Object.keys(notificationList).length !== 0) {
+                    showNotifications(notificationList);
+                }
+                timestamp = get_timestamp();
+            });
+    }, 10000);
+}
+
+async function getNotificationsCount() {
+    const response = await fetch("/notification/unread_count");
+    const json_resp = await response.json();
+    return json_resp.count;
+}
+
+document.addEventListener("DOMContentLoaded", notificationUpdates);

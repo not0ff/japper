@@ -1,8 +1,8 @@
 <div class="post card mb-3 rounded-4" id="{{ post.id }}">
     <div class="card-body">
         <div class="card-title d-flex justify-content-between">
-            <a class="h5 text-decoration-none" href="{{ url_for('core.profile', username=post.author.username) }}">
-                <img class="profile-pic-small rounded-circle img-thumbnail" src="{{ url_for('core.profile_pic', username=post.author.username) }}" alt="Profile picture">
+            <a class="h5 text-decoration-none" href="{{ url_for('profile.profile_page', username=post.author.username) }}">
+                <img class="profile-pic-small rounded-circle img-thumbnail" src="{{ url_for('profile.serve_pfp', user_id=post.author.id) }}" alt="Profile picture">
                 {% if post.author.followed %}
                 <span>{{ post.author.username }} <i class="bi bi-person-check-fill"></i></span>
                 {% elif post.author == current_user %}

@@ -1,0 +1,16 @@
+<div class="toast notification" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <img class="pfp-xsmall rounded me-2" src="{{ url_for('profile.serve_pfp', user_id=notification.issuer_id) }}" alt="Profile picture">
+        <p class="me-auto">
+            <strong>{{ notification.issuer.username }}</strong>
+            {% if not notification.read or notification.display_unread %}
+            <i class="bi bi-circle-fill text-danger small"></i>
+            {% endif %}
+        </p>
+        <small>{{ moment(notification.timestamp|timestamp_to_datetime).fromNow(refresh=True) }}</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        {{ notification.content }}
+    </div>
+</div>

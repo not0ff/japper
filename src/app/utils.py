@@ -4,13 +4,14 @@ from typing import Optional, Sequence, Union
 import sqlalchemy as sa
 from flask import current_app, flash, redirect, request, session, url_for
 from flask.typing import ResponseReturnValue
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from is_safe_url import is_safe_url
 from PIL import Image
 from werkzeug.datastructures import FileStorage
 
 from app.extensions import db
-from app.models import Like, Post, User
+from app.models import Like, Notification, Post, User
 
 
 def optimize_img(image: FileStorage, resize: bool = False) -> FileStorage:
@@ -38,11 +39,11 @@ def get_post(data: Optional[dict]) -> tuple[int, Union[Post, str]]:
         return 400, 'Invalid request'
 
     try:
-        post_id = int(data['id'])
+        id = int(data['id'])
     except (ValueError, TypeError):
         return 400, 'Invalid post ID'
 
-    post: Post = Post.query.filter_by(id=post_id).first()
+    post: Post = Post.query.get(id)
     if post is None:
         return 404, 'Post not found'
 
@@ -52,17 +53,17 @@ def get_post(data: Optional[dict]) -> tuple[int, Union[Post, str]]:
 def get_profile(data: Optional[dict]) -> tuple[int, Union[User, str]]:
     if data is None or 'id' not in data:
         return 400, 'Invalid request'
-    
-    try: 
-        user_id = int(data['id'])
+
+    try:
+        id = int(data['id'])
     except (ValueError, TypeError):
         return 400, 'Invalid user ID'
-    
-    user: User = User.query.filter_by(id=user_id).first()
+
+    user: User = User.query.get(id)
     if user is None:
         return 404, 'User not found'
-    
-    return 200, user 
+
+    return 200, user
 
 
 def get_feed() -> Sequence[Post]:
@@ -78,6 +79,12 @@ def get_feed() -> Sequence[Post]:
     ).order_by(sa.literal_column('rank').desc())
 
     return db.session.execute(query).scalars().all()
+
+
+def add_notification(user: User, content: str, issuer: User = current_user) -> None:
+    notification = Notification(
+        user_id=user.id, issuer_id=issuer.id, content=content)
+    db.session.add(notification)
 
 
 def search_post(pattern: str) -> Sequence[Post]:

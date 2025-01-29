@@ -7,6 +7,6 @@
 {% block main %}
     <p class="h2 text-body-secondary">{{ feed_title }}</p>
     {% for post in posts %}
-        {% include "components/post.html" %}
+        {% include "post/post.html" %}
     {% endfor %}
 {% endblock %}

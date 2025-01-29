@@ -6,7 +6,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="editPostForm" class="mx-auto" action="{{ url_for('api.edit_post') }}" method="post" novalidate>
+                <form id="editPostForm" class="mx-auto" action="{{ url_for('post.edit_post') }}" method="post" novalidate>
                     {{ edit_post_form.csrf_token }}
                     {{ edit_post_form.post_id(id_="editPostIdField")}}
                     <fieldset class="mt-2 mb-5">

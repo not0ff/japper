@@ -2,8 +2,8 @@
     <ul class="list-unstyled">
     {% for user in users %}
         <li class="mb-3">
-            <a class="h5 text-decoration-none" href="{{ url_for('core.profile', username=user.username) }}">
-                <img class="profile-pic-small rounded-circle img-thumbnail" src="{{ url_for('core.profile_pic', username=user.username) }}" alt="Profile picture">
+            <a class="h5 text-decoration-none" href="{{ url_for('profile.profile_page', username=user.username) }}">
+                <img class="profile-pic-small rounded-circle img-thumbnail" src="{{ url_for('profile.serve_pfp', user_id=user.id) }}" alt="Profile picture">
                 {% if user.followed %}
                 <span>{{ user.username }} <i class="bi bi-person-check-fill"></i></span>
                 {% elif user == current_user %}

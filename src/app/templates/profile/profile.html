@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-4">
                 <img
-                    src="{{ url_for('.profile_pic', username=user.username) }}"
+                    src="{{ url_for('profile.serve_pfp', user_id=user.id) }}"
                     alt="Profile picture"
                     class="profile-pic img-thumbnail rounded-circle" />
             </div>
@@ -47,13 +47,13 @@
             {% if user != current_user %}
                 <div class="col d-flex justify-content-end">
                 {% if user.followed %}
-                    <form action="{{ url_for('api.unfollow_profile') }}" method="post">
+                    <form action="{{ url_for('profile.unfollow_profile') }}" method="post">
                         {{ follow_profile_form.csrf_token }}
                         <input id="profile_id" name="profile_id" type="hidden" value="{{ user.id }}">
                         <input class="btn btn-outline-secondary" id="submit" name="submit" type="submit" value="Unfollow">
                     </form>
                 {% else %}
-                    <form action="{{ url_for('api.follow_profile') }}" method="post">
+                    <form action="{{ url_for('profile.follow_profile') }}" method="post">
                         {{ follow_profile_form.csrf_token }}
                         <input id="profile_id" name="profile_id" type="hidden" value="{{ user.id }}">
                         <input class="btn btn-outline-primary" id="submit" name="submit" type="submit" value="Follow">
@@ -65,12 +65,12 @@
     </div>
     <p class="h2 text-body-secondary">User's posts</p>
     {% for post in posts %}
-        {% include "components/post.html" %}
+        {% include "post/post.html" %}
     {% endfor %}
 {% endblock %}
 
 {% block modal %}
-    {% include "components/edit_profile.html" %}
+    {% include "profile/edit_profile.html" %}
 {% endblock %}
 
 {% block script %}

@@ -6,7 +6,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="newPostForm" class="mx-auto" action="{{ url_for('api.create_post') }}" method="post" novalidate>
+                <form id="newPostForm" class="mx-auto" action="{{ url_for('post.create_post') }}" method="post" novalidate>
                     {{ post_form.csrf_token }}
                     <fieldset class="mt-2 mb-5">
                             {{ post_form.content(class_="form-control", rows_="3", placeholder_="What do you think?") }}

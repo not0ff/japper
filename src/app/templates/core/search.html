@@ -6,7 +6,7 @@
 
 {% block main %}
     <div class="container border rounded-4 mt-2 mb-3 px-5 py-4">
-        <form class="d-flex justify-content-center" action="{{ url_for('.search') }}" method="post" novalidate>
+        <form class="d-flex justify-content-center" action="{{ url_for('core.search') }}" method="post" novalidate>
             {{ search_form.csrf_token }}
             <div class="row">
                 <h2 class="text-center">{{ search_form.query.description }}</h2>
@@ -28,7 +28,7 @@
     {% if posts %}
         <p class="h2 text-body-secondary">Found posts</p>
         {% for post in posts %}
-            {% include "components/post.html" %}
+            {% include "post/post.html" %}
         {% endfor %}
     {% elif search_form.validate_on_submit() %}
         <p class="h2 text-body-secondary">No posts found</p>
