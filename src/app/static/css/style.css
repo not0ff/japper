@@ -19,12 +19,12 @@
     padding-inline-start: 0px;
 }
 
-.profile-pic {
+.pfp {
     width: clamp(50px, 40vw, 200px);
     height: auto;
 } 
 
-.profile-pic-small {
+.pfp-small {
     width: clamp(40px, 4vw, 60px);
     height: auto;
 }

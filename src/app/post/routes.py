@@ -14,7 +14,7 @@ from . import post
 @post.route('/fetch')
 @login_required
 def fetch_post() -> ResponseReturnValue:
-    status, resp = get_post(request.args.to_dict())
+    resp, status = get_post(request.args.to_dict())
     if status != 200:
         return jsonify(resp), status
 
@@ -24,7 +24,7 @@ def fetch_post() -> ResponseReturnValue:
 @post.route('/add_like', methods=['POST'])
 @login_required
 def like_post() -> ResponseReturnValue:
-    status, resp = get_post(request.json)
+    resp, status = get_post(request.json)
     if status != 200 or not isinstance(resp, Post):
         return jsonify(resp), status
 
@@ -38,7 +38,7 @@ def like_post() -> ResponseReturnValue:
 @post.route('/get_likes')
 @login_required
 def get_likes() -> ResponseReturnValue:
-    status, resp = get_post(request.args.to_dict())
+    resp, status = get_post(request.args.to_dict())
     if status != 200:
         return jsonify(resp), status
     likes_users = None
@@ -51,7 +51,7 @@ def get_likes() -> ResponseReturnValue:
 @post.route('/remove_like', methods=['POST'])
 @login_required
 def remove_post() -> ResponseReturnValue:
-    status, resp = get_post(request.json)
+    resp, status = get_post(request.json)
     if status != 200:
         return jsonify(resp), status
 

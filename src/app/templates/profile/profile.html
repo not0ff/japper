@@ -11,7 +11,7 @@
                 <img
                     src="{{ url_for('profile.serve_pfp', user_id=user.id) }}"
                     alt="Profile picture"
-                    class="profile-pic img-thumbnail rounded-circle" />
+                    class="pfp img-thumbnail rounded-circle" />
             </div>
         {% if user == current_user %}
             <div class="col d-flex justify-content-end">
@@ -32,8 +32,8 @@
                 </p>
             </div>
             <div class="col">
-                <p class="h6 text-end pt-2"><a href="#" class="text-decoration-none text-white" data-bs-id="{{ user.id }}" data-bs-list-type="followers" onclick="showUserList(this)">Followers: {{ user.followers|count }}</a></p>
-                <p class="h6 text-end"><a href="#" class="text-decoration-none text-white" data-bs-id="{{ user.id }}" data-bs-list-type="following" onclick="showUserList(this)">Following: {{ user.following|count }}</a></p>
+                <p class="h6 text-end pt-2"><a href="#" class="text-decoration-none text-white" data-element-id="{{ user.id }}" data-list="followers" onclick="showUserList(this)">Followers: {{ user.followers|count }}</a></p>
+                <p class="h6 text-end"><a href="#" class="text-decoration-none text-white" data-element-id="{{ user.id }}" data-list="following" onclick="showUserList(this)">Following: {{ user.following|count }}</a></p>
             </div>
         </div>
         <div class="row me-3">

@@ -104,7 +104,7 @@ def unfollow_profile() -> ResponseReturnValue:
 @profile.route('/get_followers')
 @login_required
 def get_followers() -> ResponseReturnValue:
-    status, resp = get_profile(request.args.to_dict())
+    resp, status = get_profile(request.args.to_dict())
     if status != 200:
         return jsonify(resp), status
 
@@ -118,7 +118,7 @@ def get_followers() -> ResponseReturnValue:
 @profile.route('/get_following')
 @login_required
 def get_following() -> ResponseReturnValue:
-    status, resp = get_profile(request.args.to_dict())
+    resp, status = get_profile(request.args.to_dict())
     if status != 200:
         return jsonify(resp), status
 

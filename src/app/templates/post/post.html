@@ -2,7 +2,7 @@
     <div class="card-body">
         <div class="card-title d-flex justify-content-between">
             <a class="h5 text-decoration-none" href="{{ url_for('profile.profile_page', username=post.author.username) }}">
-                <img class="profile-pic-small rounded-circle img-thumbnail" src="{{ url_for('profile.serve_pfp', user_id=post.author.id) }}" alt="Profile picture">
+                <img class="pfp-small rounded-circle img-thumbnail" src="{{ url_for('profile.serve_pfp', user_id=post.author.id) }}" alt="Profile picture">
                 {% if post.author.followed %}
                 <span>{{ post.author.username }} <i class="bi bi-person-check-fill"></i></span>
                 {% elif post.author == current_user %}
@@ -18,11 +18,11 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     {% if post.author == current_user %}
                     <li>
-                        <a href="#" id="editPostButton" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editPost" data-bs-id="{{ post.id }}" onclick="editPostButtonClicked(this)">Edit</a>
+                        <a href="#" id="editPostButton" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editPost" data-post-id="{{ post.id }}" onclick="editPostButtonClicked(this)">Edit</a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <a href="#" class="dropdown-item link-danger" data-bs-toggle="modal" data-bs-target="#deletePost" data-bs-id="{{ post.id }}" onclick="deletePostButtonClicked(this)">Delete</a>
+                        <a href="#" class="dropdown-item link-danger" data-bs-toggle="modal" data-bs-target="#deletePost" data-post-id="{{ post.id }}" onclick="deletePostButtonClicked(this)">Delete</a>
                     </li>
                     {% else %}
                     <li>
@@ -39,10 +39,10 @@
             <small class="text-body-tertiary">{{ moment(post.timestamp).fromNow(refresh=True) }} {% if post.edited %}(edited){% endif %} </small>
         </p>
         <div class="d-flex justify-content-between">
-            <a href="#" class="card-link btn btn-sm rounded-5 btn-outline-warning like-btn {% if post.liked %}active{% endif %}" data-bs-toggle="button" aria-pressed="{{ 'true' if post.liked else 'false' }}" data-bs-id="{{ post.id }}" onclick="likeButtonClicked(this)">
+            <a href="#" class="card-link btn btn-sm rounded-5 btn-outline-warning like-btn {% if post.liked %}active{% endif %}" data-bs-toggle="button" aria-pressed="{{ 'true' if post.liked else 'false' }}" data-post-id="{{ post.id }}" onclick="likeButtonClicked(this)">
                 <span>✨ {{ post.likes|count }} Aura ✨</span>
             </a>
-            <button type="button" class="btn btn-link p-0" data-bs-id="{{ post.id }}" data-bs-list-type="likes" onclick="showUserList(this)">
+            <button type="button" class="btn btn-link p-0" data-element-id="{{ post.id }}" data-list="likes" onclick="showUserList(this)">
                 <i class="bi bi-list-stars text-white"></i>
             </button>
         </div>

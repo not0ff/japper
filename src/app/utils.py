@@ -34,36 +34,36 @@ def optimize_img(image: FileStorage, resize: bool = False) -> FileStorage:
     )
 
 
-def get_post(data: Optional[dict]) -> tuple[int, Union[Post, str]]:
+def get_post(data: Optional[dict]) -> tuple[Union[Post, dict], int]:
     if data is None or 'id' not in data:
-        return 400, 'Invalid request'
+        return {'status': 'error', 'message': 'Invalid request'}, 400
 
     try:
         id = int(data['id'])
     except (ValueError, TypeError):
-        return 400, 'Invalid post ID'
+        return {'status': 'error', 'message': 'Invalid post ID'}, 400
 
     post: Post = Post.query.get(id)
     if post is None:
-        return 404, 'Post not found'
+        return {'status': 'error', 'message': 'Post not found'}, 404
 
-    return 200, post
+    return post, 200
 
 
-def get_profile(data: Optional[dict]) -> tuple[int, Union[User, str]]:
+def get_profile(data: Optional[dict]) -> tuple[Union[User, dict], int]:
     if data is None or 'id' not in data:
-        return 400, 'Invalid request'
+        return {'status': 'error', 'message': 'Invalid request'}, 400
 
     try:
         id = int(data['id'])
     except (ValueError, TypeError):
-        return 400, 'Invalid user ID'
+        return {'status': 'error', 'message': 'Invalid user ID'}, 400
 
     user: User = User.query.get(id)
     if user is None:
-        return 404, 'User not found'
+        return {'status': 'error', 'message': 'User not found'}, 404
 
-    return 200, user
+    return user, 200
 
 
 def get_feed() -> Sequence[Post]:

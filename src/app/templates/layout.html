@@ -63,7 +63,7 @@
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a href="{{ url_for('profile.profile_page', username=current_user.username) }}" class="nav-link dropdown-toggle fw-semibold" role="button" data-bs-toggle="dropdown">
+                            <a href="{{ url_for('profile.profile_page', username=current_user.username) }}" class="nav-link dropdown-toggle fw-semibold position-relative" id="userMenu" role="button" data-bs-toggle="dropdown">
                                 {{ current_user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end position-absolute">
@@ -76,8 +76,10 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <button type="button" class="btn btn-link p-0" onclick="getAllNotifications()">
-                                        <span class="dropdown-item fw-semibold">Notifications</span>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none position-relative" id="notificationsBtn" onclick="getAllNotifications()">
+                                        <span class="dropdown-item fw-semibold">
+                                            Notifications
+                                        </span>
                                     </button>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
