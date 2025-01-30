@@ -2,7 +2,7 @@ from os import path, remove
 
 import sqlalchemy as sa
 from flask import (flash, jsonify, render_template, request, send_file,
-                   send_from_directory, url_for)
+                   send_from_directory, url_for, jsonify)
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
@@ -112,7 +112,7 @@ def get_followers() -> ResponseReturnValue:
     if isinstance(resp, User):
         followers = resp.followers
 
-    return render_template('components/user_list.html', users=followers)
+    return jsonify({'status': 'ok', 'result': {'userList': render_template('components/user_list.html', users=followers)}}), 200
 
 
 @profile.route('/get_following')
@@ -126,4 +126,4 @@ def get_following() -> ResponseReturnValue:
     if isinstance(resp, User):
         followers = resp.following
 
-    return render_template('components/user_list.html', users=followers)
+    return jsonify({'status': 'ok', 'result': {'userList': render_template('components/user_list.html', users=followers)}}), 200

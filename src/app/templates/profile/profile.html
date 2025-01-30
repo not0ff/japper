@@ -64,9 +64,13 @@
         </div>
     </div>
     <p class="h2 text-body-secondary">User's posts</p>
-    {% for post in posts %}
-        {% include "post/post.html" %}
-    {% endfor %}
+    {% if posts|list %}
+        {% for post in posts %}
+            {% include "post/post.html" %}
+        {% endfor %}
+    {% else %}
+    <p class="fs-5 mt-5">Nothing in here yet!</p>
+    {% endif %}
 {% endblock %}
 
 {% block modal %}

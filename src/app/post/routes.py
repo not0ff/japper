@@ -14,51 +14,52 @@ from . import post
 @post.route('/fetch')
 @login_required
 def fetch_post() -> ResponseReturnValue:
-    resp, status = get_post(request.args.to_dict())
+    post, status = get_post(request.args.to_dict())
     if status != 200:
-        return jsonify(resp), status
+        return jsonify(post), status
 
-    return render_template('post/post.html', post=resp)
+    return jsonify({'status': 'ok', 'result': {'post': render_template('post/post.html', post=post)}}), 200
 
 
 @post.route('/add_like', methods=['POST'])
 @login_required
 def like_post() -> ResponseReturnValue:
-    resp, status = get_post(request.json)
-    if status != 200 or not isinstance(resp, Post):
-        return jsonify(resp), status
-
-    current_user.add_like(resp)
-    add_notification(user=resp.author, content=f'{current_user.username} gave you aura!')
+    post, status = get_post(request.json)
+    if status != 200 or not isinstance(post, Post):
+        return jsonify(post), status
+    
+    current_user.add_like(post)
+    if current_user != post.author:
+        add_notification(user=post.author, content=f'{current_user.username} gave you aura!')
     db.session.commit()
 
-    return 'Like added successfully', 200
+    return jsonify({'status': 'ok'}), 200
 
 
 @post.route('/get_likes')
 @login_required
 def get_likes() -> ResponseReturnValue:
-    resp, status = get_post(request.args.to_dict())
+    post, status = get_post(request.args.to_dict())
     if status != 200:
-        return jsonify(resp), status
+        return jsonify(post), status
     likes_users = None
-    if isinstance(resp, Post):
-        likes_users = [User.query.get(like.user_id) for like in resp.likes]
+    if isinstance(post, Post):
+        likes_users = [User.query.get(like.user_id) for like in post.likes]
 
-    return render_template('components/user_list.html', users=likes_users)
+    return jsonify({'status': 'ok', 'result': {'userList': render_template('components/user_list.html', users=likes_users)}}), 200
 
 
 @post.route('/remove_like', methods=['POST'])
 @login_required
 def remove_post() -> ResponseReturnValue:
-    resp, status = get_post(request.json)
+    post, status = get_post(request.json)
     if status != 200:
-        return jsonify(resp), status
+        return jsonify(post), status
 
-    current_user.remove_like(resp)
+    current_user.remove_like(post)
     db.session.commit()
 
-    return 'Like removed successfully', 200
+    return jsonify({'status': 'ok'}), 200
 
 
 @post.route('/create', methods=['POST'])
@@ -69,6 +70,9 @@ def create_post() -> ResponseReturnValue:
         post: Post = Post(user_id=current_user.id,
                           content=form.content.data)
         db.session.add(post)
+        for follower in current_user.followers:
+            add_notification(user=follower, content=f'{current_user.username} has made a new post!')
+        
         db.session.commit()
 
     elif form.errors:

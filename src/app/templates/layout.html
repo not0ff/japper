@@ -24,27 +24,23 @@
         <nav class="sticky-top navbar navbar-expand-lg bg-dark navbar-dark border-bottom border-dark-subtle mb-4">
             <div class="container-fluid">
                 <a href="{{ url_for('core.index') }}" class="navbar-brand ms-1">
-                    <img
-                        src="{{ url_for('static', filename='images/favicon.png') }}"
-                        alt="Logo"
-                        width="32"
-                        height="32"
-                        class="d-inline-block align-text-top mx-1" />
+                    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Logo" width="32" height="32" class="d-inline-block align-text-top mx-1">
                     <span class="h4 chango-text">Japper</span>
                 </a>
-                <button
-                    class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse"  id="navbarSupportedContent">
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto me-3 my-1 d-flex justify-content-evenly flex-row gap-3">
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             <a href="{{ url_for('core.feed') }}" class="nav-link fw-semibold">
                                 Feed
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('core.following') }}" class="nav-link fw-semibold">
+                                Following
                             </a>
                         </li>
                         <li class="nav-item">
@@ -57,16 +53,11 @@
                                 Post
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ url_for('core.search') }}" class="nav-link fw-semibold">
-                                Search
-                            </a>
-                        </li>
                         <li class="nav-item dropdown">
-                            <a href="{{ url_for('profile.profile_page', username=current_user.username) }}" class="nav-link dropdown-toggle fw-semibold position-relative" id="userMenu" role="button" data-bs-toggle="dropdown">
+                            <a href="{{ url_for('profile.profile_page', username=current_user.username) }}" class="nav-link dropdown-toggle fw-semibold position-relative" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ current_user.username }}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end position-absolute">
+                            <ul class="dropdown-menu dropdown-menu-end position-absolute" onclick="event.stopPropagation();">
                                 <li>
                                     <h6 class="dropdown-header">User menu</h6>
                                 </li>
@@ -76,11 +67,16 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none position-relative" id="notificationsBtn" onclick="getAllNotifications()">
-                                        <span class="dropdown-item fw-semibold">
+                                    <a class="btn btn-link text-decoration-none dropdown-item" role="button" id="notificationsBtn" tabindex="0" onclick="getAllNotifications()">
+                                        <span class="fw-semibold position-relative">
                                             Notifications
                                         </span>
-                                    </button>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('core.search') }}" class="dropdown-item fw-semibold">
+                                        Search
+                                    </a>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li>
@@ -134,9 +130,10 @@
         {% block modal %}{% endblock %}
         {% block script %}{% endblock %}
         <script>
-            document.querySelectorAll("ul.navbar-nav a.nav-link").forEach(function (link) {
+            document.querySelectorAll('ul.navbar-nav a.nav-link').forEach(function (link) {
                 if (link.href === window.location.href) {
-                    link.classList.add("active");
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'page');
                 }
             });
         </script>

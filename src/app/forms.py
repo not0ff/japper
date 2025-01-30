@@ -61,7 +61,8 @@ class LoginForm(FlaskForm):
 
 
 class EditProfileForm(FlaskForm):
-    image: FileField = FileField('Profile picture', validators=[
+    image: FileField = FileField('Profile picture',
+        description='Up to 8MB in size', validators=[
         FileAllowed(profile_imgs, message='Pick an image file!'),
         FileSize(max_size=8*1024*1024, message='File is bigger than 8MB!'),
         validate_image])
