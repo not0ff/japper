@@ -52,7 +52,7 @@ def create_app(config_class=Config) -> Flask:
 
     @app.context_processor
     def pass_post_form() -> dict[str, PostForm]:
-        if request.method == 'GET':
+        if request.method == 'GET' or request.path.startswith('/search/'):
             return {'post_form': PostForm(), 'edit_post_form': EditPostForm(), 'delete_post_form': DeletePostForm()}
         return {}
         
