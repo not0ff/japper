@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from flask import Flask
+from flask import Flask, request
 from flask.wrappers import Request
 from flask_uploads import configure_uploads
 
@@ -37,14 +37,25 @@ def create_app(config_class=Config) -> Flask:
     from app.notification import notification
     app.register_blueprint(notification)
 
+    from app.errors import bad_request, unauthorized, forbidden, not_found, method_not_allowed, payload_too_large, internal_error
+    app.register_error_handler(400, bad_request)
+    app.register_error_handler(401, unauthorized)
+    app.register_error_handler(403, forbidden)
+    app.register_error_handler(404, not_found)
+    app.register_error_handler(405, method_not_allowed)
+    app.register_error_handler(413, payload_too_large)
+    app.register_error_handler(500, internal_error)
+
     @app.template_filter()
     def timestamp_to_datetime(timestamp):
         return datetime.fromtimestamp(timestamp, timezone.utc)
 
     @app.context_processor
     def pass_post_form() -> dict[str, PostForm]:
-        return {'post_form': PostForm(), 'edit_post_form': EditPostForm(), 'delete_post_form': DeletePostForm()}
-
+        if request.method == 'GET':
+            return {'post_form': PostForm(), 'edit_post_form': EditPostForm(), 'delete_post_form': DeletePostForm()}
+        return {}
+        
     @app.after_request
     def add_header(request: Request) -> Request:
         request.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'

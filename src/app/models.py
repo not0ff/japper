@@ -29,7 +29,7 @@ class User(UserMixin, db.Model):  # type: ignore
     posts: Mapped['Post'] = relationship(
         'Post', backref=backref('author'))
     likes: Mapped[list['Like']] = relationship(
-        'Like', backref=backref('user', lazy='select'))
+        'Like', backref=backref('user'))
     following: Mapped[list['User']] = relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -90,7 +90,7 @@ class Post(db.Model):  # type: ignore
     edited: Mapped[bool] = mapped_column(
         sa.Boolean, default=False, onupdate=True)
     likes: Mapped[list['Like']] = relationship(
-        'Like', backref=backref('post', lazy='select'))
+        'Like', backref=backref('post'))
 
     @hybrid_property
     def liked(self):

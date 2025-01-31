@@ -14,7 +14,7 @@ class Config:
     
     UPLOADED_PROFILES_DEST = os.path.join(basedir, 'uploads/profiles')
     UPLOADED_POSTS_DEST = os.path.join(basedir, 'uploads/posts')
-    MAX_CONTENT_LENGTH = 30 * 1024 * 1024
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024
 
     SESSION_TYPE: str = 'cachelib'
     SESSION_CACHELIB: FileSystemCache = FileSystemCache(cache_dir='sessions')
