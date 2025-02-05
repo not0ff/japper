@@ -103,8 +103,8 @@ def delete_post() -> ResponseReturnValue:
     form: DeletePostForm = DeletePostForm()
     if form.validate_on_submit():
         post: Post = Post.query.filter_by(
-            id=form.post_id.data, user_id=current_user.id).delete()
-
+            id=form.post_id.data, user_id=current_user.id).first_or_404()
+        db.session.delete(post)
         db.session.commit()
     elif form.errors:
         flash_form_errors(form)

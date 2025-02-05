@@ -27,9 +27,11 @@ class User(UserMixin, db.Model):  # type: ignore
     password_hash: Mapped[str | None] = mapped_column(
         db.String(120), nullable=True)
     posts: Mapped['Post'] = relationship(
-        'Post', backref=backref('author'))
+        'Post', backref=backref('author'),
+        cascade='all, delete-orphan')
     likes: Mapped[list['Like']] = relationship(
-        'Like', backref=backref('user'))
+        'Like', backref=backref('user'), 
+        cascade='all, delete-orphan')
     following: Mapped[list['User']] = relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -41,9 +43,11 @@ class User(UserMixin, db.Model):  # type: ignore
         secondaryjoin=(followers.c.follower_id == id),
         back_populates='following')
     notifications: Mapped['Notification'] = relationship(
-        'Notification', backref=backref('user'), foreign_keys='Notification.user_id')
+        'Notification', backref=backref('user'), foreign_keys='Notification.user_id', 
+        cascade='all, delete-orphan')
     notified: Mapped['Notification'] = relationship(
-        'Notification', backref=backref('issuer'), foreign_keys='Notification.issuer_id')
+        'Notification', backref=backref('issuer'), foreign_keys='Notification.issuer_id', 
+        cascade='all, delete-orphan')
 
     @hybrid_property
     def followed(self):
@@ -64,10 +68,11 @@ class User(UserMixin, db.Model):  # type: ignore
 
     def remove_like(self, post: 'Post') -> None:
         if post.liked:
-            Like.query.filter_by(
+            like: Like = Like.query.filter_by(
                 user_id=self.id,
                 post_id=post.id
-            ).delete()
+            ).first()
+            db.session.delete(like)
 
     def follow(self, user: 'User') -> None:
         if not user.followed:
@@ -90,7 +95,7 @@ class Post(db.Model):  # type: ignore
     edited: Mapped[bool] = mapped_column(
         sa.Boolean, default=False, onupdate=True)
     likes: Mapped[list['Like']] = relationship(
-        'Like', backref=backref('post'))
+        'Like', backref=backref('post'), cascade='all, delete-orphan')
 
     @hybrid_property
     def liked(self):
