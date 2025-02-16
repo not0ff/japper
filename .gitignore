@@ -331,3 +331,4 @@ app.db
 sessions/
 migrations/
 uploads/
+README.md.old
