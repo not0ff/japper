@@ -1,0 +1,61 @@
+[project]
+name = "japper"
+version = "1.0.0"
+description = "Japper is a minimal micro-blogging site built with Flask"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "filetype>=1.2.0",
+    "flask>=3.1.0",
+    "flask-login>=0.6.3",
+    "flask-migrate>=4.1.0",
+    "flask-moment>=1.0.6",
+    "flask-reuploaded>=1.4.0",
+    "flask-session>=0.8.0",
+    "flask-sqlalchemy>=3.1.1",
+    "flask-wtf>=1.2.2",
+    "is-safe-url>=1.0",
+    "pillow>=11.2.1",
+    "python-dotenv>=1.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pre-commit>=4.2.0",
+    "ruff>=0.11.7",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # isort
+    "I",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # flake8-async
+    "ASYNC",
+    #flake8-bandit
+    "S",
+    #flake8-logging
+    "LOG",
+    #flake8-logging-format
+    "G",
+    #pep8-naming
+    "N",
+    #Perflint
+    "PERF",
+    #Ruff-specific
+    "RUF",
+]

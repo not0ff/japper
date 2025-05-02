@@ -1,11 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from flask import Flask, request
 from flask.wrappers import Request
 from flask_uploads import configure_uploads
 
-from app.extensions import (csrf, db, login_manager, migrate, moment, session,
-                            uploads)
+from app.extensions import csrf, db, login_manager, migrate, moment, session, uploads
 from app.forms import DeletePostForm, EditPostForm, PostForm
 from config import Config
 
@@ -23,21 +22,35 @@ def create_app(config_class=Config) -> Flask:
     configure_uploads(app, uploads)
 
     from app.core import core
+
     app.register_blueprint(core)
 
     from app.auth import auth
+
     app.register_blueprint(auth)
 
     from app.post import post
+
     app.register_blueprint(post)
 
     from app.profile import profile
+
     app.register_blueprint(profile)
 
     from app.notification import notification
+
     app.register_blueprint(notification)
 
-    from app.errors import bad_request, unauthorized, forbidden, not_found, method_not_allowed, payload_too_large, internal_error
+    from app.errors import (
+        bad_request,
+        forbidden,
+        internal_error,
+        method_not_allowed,
+        not_found,
+        payload_too_large,
+        unauthorized,
+    )
+
     app.register_error_handler(400, bad_request)
     app.register_error_handler(401, unauthorized)
     app.register_error_handler(403, forbidden)
@@ -48,19 +61,23 @@ def create_app(config_class=Config) -> Flask:
 
     @app.template_filter()
     def timestamp_to_datetime(timestamp):
-        return datetime.fromtimestamp(timestamp, timezone.utc)
+        return datetime.fromtimestamp(timestamp, UTC)
 
     @app.context_processor
     def pass_post_form() -> dict[str, PostForm]:
-        if request.method == 'GET' or request.path.startswith('/search/'):
-            return {'post_form': PostForm(), 'edit_post_form': EditPostForm(), 'delete_post_form': DeletePostForm()}
+        if request.method == "GET" or request.path.startswith("/search/"):
+            return {
+                "post_form": PostForm(),
+                "edit_post_form": EditPostForm(),
+                "delete_post_form": DeletePostForm(),
+            }
         return {}
-        
+
     @app.after_request
     def add_header(request: Request) -> Request:
-        request.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        request.headers['Pragma'] = 'no-cache'
-        request.headers['Expires'] = '0'
+        request.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        request.headers["Pragma"] = "no-cache"
+        request.headers["Expires"] = "0"
         return request
 
     return app

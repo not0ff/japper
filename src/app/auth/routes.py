@@ -10,27 +10,27 @@ from app.utils import redirect_to_next
 from . import auth
 
 
-@auth.route('/login/', methods=['GET', 'POST'])
+@auth.route("/login/", methods=["GET", "POST"])
 def login() -> ResponseReturnValue:
     if current_user.is_authenticated:
-        return redirect(url_for('core.index'))
+        return redirect(url_for("core.index"))
 
     login_form = LoginForm()
     if login_form.validate_on_submit():
         user = User.query.filter_by(username=login_form.username.data).first()
         if user is None or not user.check_password(login_form.password.data):
-            flash('Invalid username or password!', category='danger')
-            return redirect(url_for('.login'))
+            flash("Invalid username or password!", category="danger")
+            return redirect(url_for(".login"))
         login_user(user, remember=login_form.remember.data)
-        
+
         return redirect_to_next()
-    return render_template('auth/login.html', login_form=login_form)
+    return render_template("auth/login.html", login_form=login_form)
 
 
-@auth.route('/signup/', methods=['GET', 'POST'])
+@auth.route("/signup/", methods=["GET", "POST"])
 def signup() -> ResponseReturnValue:
     if current_user.is_authenticated:
-        return redirect(url_for('core.index'))
+        return redirect(url_for("core.index"))
 
     signup_form = SignupForm()
     if signup_form.validate_on_submit():
@@ -38,14 +38,16 @@ def signup() -> ResponseReturnValue:
         user.set_password(signup_form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Registration completed! You can now log into your account',
-              category='success')
-        return redirect(url_for('.login'))
-    return render_template('auth/signup.html', signup_form=signup_form)
+        flash(
+            "Registration completed! You can now log into your account",
+            category="success",
+        )
+        return redirect(url_for(".login"))
+    return render_template("auth/signup.html", signup_form=signup_form)
 
 
-@auth.route('/logout/')
+@auth.route("/logout/")
 @login_required
 def logout() -> ResponseReturnValue:
     logout_user()
-    return redirect(url_for('.login'))
+    return redirect(url_for(".login"))

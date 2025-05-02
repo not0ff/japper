@@ -10,30 +10,35 @@ Japper is a minimal micro-blogging web app that with it's social features allows
   - [Technologies](#technologies)
 
 ## Installation
-1. Create a virtual python environment
-    ```
-    $ python -m venv venv
-    ```
-2. Activate it
+1. Make sure you have uv installed
+   ```
+   $ pip install uv
+   ```
+2. Install project's dependencies
+   ```
+   $ uv sync
+   ```
+3. Activate the created virtual environment
 - On Windows:
   ```
-  $ .\venv\Scripts\activate.bat
+  $ .\.venv\Scripts\activate.bat
   ```
 - On Linux:
   ```
-  $ source venv/bin/activate
+  $ source .venv/bin/activate
   ```
-3. Install required dependencies
-   ```
-   $ pip install -r requirements.txt
-   ```
 
 ## Usage
 Quick guide how to run the project
 
-1. Create .env file with flask secret key to sign and encrypt cookies
+1. Set env variable with flask secret key
+- On Windows:
    ```
-   SECRET_KEY = [secure_key_here]
+   $ set SECRET_KEY=<secure_key_here>
+   ```
+- On Linux:
+   ```
+   $ export SECRET_KEY=<secure_key_here>
    ```
 
 2. Navigate to source directory
@@ -42,8 +47,6 @@ Quick guide how to run the project
    ```
 3. Initialize local testing database with flask-migrate
    ```
-   $ flask db init
-   $ flask db migrate
    $ flask db upgrade
    ```
 4. Start a local development server
@@ -59,7 +62,7 @@ List of most important features include:
 - **Following** users you like
 - Getting relevant **notifications**
 - **Searching** for interesting content
-  
+
 ## Technologies
 Japper was built with following frameworks and tools:
 - <ins>Flask</ins> -> Main web framework
