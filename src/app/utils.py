@@ -65,26 +65,18 @@ def get_profile(data: dict | None) -> tuple[User | dict, int]:
 
 
 def get_feed() -> Sequence[Post]:
-    query: sa.Select = sa.select(
-        Post,
-        (
-            (
-                sa.select(sa.func.count())
-                .where(Like.post_id == Post.id)
-                .scalar_subquery()
-            )
-            / (
-                (
-                    sa.func.strftime("%s", sa.func.now())
-                    - sa.func.strftime("%s", Post.timestamp)
-                )
-                + 1
-            )
-        ).label("rank"),
-    ).order_by(sa.literal_column("rank").desc())
-
+    rank_expr = (
+        sa.select(sa.func.count())
+        .where(Like.post_id == Post.id)
+        .scalar_subquery()
+    ) / (
+        (sa.extract('epoch', sa.func.now()) - sa.extract('epoch', Post.timestamp)) + 1
+    )
+    query = (
+        sa.select(Post, rank_expr.label('rank'))
+        .order_by(sa.literal_column('rank').desc())
+    )
     return db.session.execute(query).scalars().all()
-
 
 def add_notification(user: User, content: str, issuer: User = current_user) -> None:
     notification = Notification(user_id=user.id, issuer_id=issuer.id, content=content)

@@ -20,7 +20,7 @@ class User(UserMixin, db.Model):  # type: ignore
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     username: Mapped[str] = mapped_column(sa.String(16), unique=True)
     bio: Mapped[str | None] = mapped_column(sa.String(120), nullable=True)
-    password_hash: Mapped[str | None] = mapped_column(db.String(120), nullable=True)
+    password_hash: Mapped[str | None] = mapped_column(db.String(255), nullable=True)
     posts: Mapped["Post"] = relationship(
         "Post", backref=backref("author"), cascade="all, delete-orphan"
     )

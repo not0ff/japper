@@ -22,6 +22,16 @@ dmypy.json
 # ruff
 .ruff_cache/
 
+# for docker
+Dockerfile
+compose.yaml
+.dockerignore
+.gitignore
+.git/
+LICENSE
+README.md
+.pre-commit-config.yaml
+
 # Custom rules
 !.gitkeep
 app.db

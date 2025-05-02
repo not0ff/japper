@@ -4,12 +4,12 @@ Japper is a minimal micro-blogging web app that with it's social features allows
 ## Table of Contents
 - [Japper](#japper)
   - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Usage](#usage)
+  - [Running locally](#running-locally)
+  - [Running with docker](#running-with-docker)
   - [Features](#features)
   - [Technologies](#technologies)
 
-## Installation
+## Running locally
 1. Make sure you have uv installed
    ```
    $ pip install uv
@@ -19,41 +19,48 @@ Japper is a minimal micro-blogging web app that with it's social features allows
    $ uv sync
    ```
 3. Activate the created virtual environment
-- On Windows:
-  ```
-  $ .\.venv\Scripts\activate.bat
-  ```
-- On Linux:
-  ```
-  $ source .venv/bin/activate
-  ```
-
-## Usage
-Quick guide how to run the project
-
-1. Set env variable with flask secret key
-- On Windows:
+   - On Windows:
    ```
-   $ set SECRET_KEY=<secure_key_here>
+   $ .\.venv\Scripts\activate.bat
    ```
-- On Linux:
+   - On Linux:
    ```
-   $ export SECRET_KEY=<secure_key_here>
+   $ source .venv/bin/activate
    ```
-
-2. Navigate to source directory
+4. Set env variable with flask secret key
+   - On Windows:
+      ```
+      $ set SECRET_KEY=<secure_key_here>
+      ```
+   - On Linux:
+      ```
+      $ export SECRET_KEY=<secure_key_here>
+      ```
+5. Navigate to source directory
    ```
    $ cd src/
    ```
-3. Initialize local testing database with flask-migrate
+6. Initialize local sqlite database with flask-migrate
    ```
    $ flask db upgrade
    ```
-4. Start a local development server
+7. Start a development server
    ```
-   $ flask run
+   $ gunicorn --bind 0.0.0.0:8000 wsgi:app
    ```
-5. Visit http://127.0.0.1:5000 on your browser
+8. Visit http://127.0.0.1:8000 on your browser
+
+## Running with docker
+1. Create .env file or set flask secret key and postgres credentials manually (required variables in .env.example file)
+2. Run docker compose
+```
+$ docker compose up --build -d
+```
+3. Go to http://127.0.0.1:8000 
+4. Then later
+```
+$ docker compose down
+```
 
 ## Features
 List of most important features include:

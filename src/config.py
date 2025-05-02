@@ -16,7 +16,9 @@ class Config:
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024
 
     SESSION_TYPE: str = "cachelib"
-    SESSION_CACHELIB: FileSystemCache = FileSystemCache(cache_dir="sessions")
+    SESSION_CACHELIB: FileSystemCache = FileSystemCache(
+        cache_dir=os.path.join(basedir, "sessions")
+    )
     USE_SESSION_FOR_NEXT: bool = True
     REMEMBER_COOKIE_DURATION: timedelta = timedelta(weeks=1)
 
