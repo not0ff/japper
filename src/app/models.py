@@ -2,11 +2,14 @@ from datetime import UTC, datetime
 
 import sqlalchemy as sa
 from flask_login import UserMixin, current_user
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, backref, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db, login_manager
+
+BaseModel: DeclarativeMeta = db.Model
 
 followers = sa.Table(
     "followers",
@@ -16,7 +19,7 @@ followers = sa.Table(
 )
 
 
-class User(UserMixin, db.Model):  # type: ignore
+class User(UserMixin, BaseModel):
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     username: Mapped[str] = mapped_column(sa.String(16), unique=True)
     bio: Mapped[str | None] = mapped_column(sa.String(120), nullable=True)
@@ -73,7 +76,11 @@ class User(UserMixin, db.Model):  # type: ignore
 
     def remove_like(self, post: "Post") -> None:
         if post.liked:
-            like: Like = Like.query.filter_by(user_id=self.id, post_id=post.id).first()
+            like: Like = (
+                db.session.query(Like)
+                .filter_by(user_id=self.id, post_id=post.id)
+                .first()
+            )
             db.session.delete(like)
 
     def follow(self, user: "User") -> None:
@@ -87,7 +94,7 @@ class User(UserMixin, db.Model):  # type: ignore
             db.session.add(self)
 
 
-class Post(db.Model):  # type: ignore
+class Post(BaseModel):
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(sa.Integer, sa.ForeignKey(User.id), index=True)
     content: Mapped[str | None] = mapped_column(sa.String(200), nullable=True)
@@ -104,13 +111,13 @@ class Post(db.Model):  # type: ignore
         return set(current_user.likes) & set(self.likes)
 
 
-class Like(db.Model):  # type: ignore
+class Like(BaseModel):
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(sa.Integer, sa.ForeignKey(User.id), index=True)
     post_id: Mapped[int] = mapped_column(sa.Integer, sa.ForeignKey(Post.id), index=True)
 
 
-class Notification(db.Model):  # type: ignore
+class Notification(BaseModel):
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(sa.Integer, sa.ForeignKey(User.id), index=True)
     issuer_id: Mapped[int] = mapped_column(
@@ -130,4 +137,4 @@ class Notification(db.Model):  # type: ignore
 
 @login_manager.user_loader
 def load_user(id: str) -> User | None:
-    return User.query.get(int(id))
+    return db.session.query(User).get(int(id))

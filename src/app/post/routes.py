@@ -1,4 +1,4 @@
-from flask import jsonify, render_template, request
+from flask import abort, jsonify, render_template, request
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 
@@ -107,7 +107,12 @@ def create_post() -> ResponseReturnValue:
 def edit_post() -> ResponseReturnValue:
     form: EditPostForm = EditPostForm()
     if form.validate_on_submit():
-        post: Post = Post.query.filter_by(id=form.post_id.data, user_id=current_user.id)
+        post: Post | None = db.session.query(Post).filter_by(
+            id=form.post_id.data, user_id=current_user.id
+        )
+        if post is None:
+            abort(404)
+            return
         post.update({Post.content: form.content.data})
 
         db.session.commit()
@@ -122,9 +127,15 @@ def edit_post() -> ResponseReturnValue:
 def delete_post() -> ResponseReturnValue:
     form: DeletePostForm = DeletePostForm()
     if form.validate_on_submit():
-        post: Post = Post.query.filter_by(
-            id=form.post_id.data, user_id=current_user.id
-        ).first_or_404()
+        post: Post | None = (
+            db.session.query(Post)
+            .filter_by(id=form.post_id.data, user_id=current_user.id)
+            .first()
+        )
+        if post is None:
+            abort(404)
+            return
+
         db.session.delete(post)
         db.session.commit()
     elif form.errors:

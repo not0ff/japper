@@ -17,7 +17,9 @@ def login() -> ResponseReturnValue:
 
     login_form = LoginForm()
     if login_form.validate_on_submit():
-        user = User.query.filter_by(username=login_form.username.data).first()
+        user: User | None = (
+            db.session.query(User).filter_by(username=login_form.username.data).first()
+        )
         if user is None or not user.check_password(login_form.password.data):
             flash("Invalid username or password!", category="danger")
             return redirect(url_for(".login"))

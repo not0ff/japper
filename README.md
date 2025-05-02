@@ -56,7 +56,7 @@ Japper is a minimal micro-blogging web app that with it's social features allows
 ```
 $ docker compose up --build -d
 ```
-3. Go to http://127.0.0.1:8000 
+3. Go to http://127.0.0.1:8000
 4. Then later
 ```
 $ docker compose down

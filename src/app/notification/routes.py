@@ -16,9 +16,10 @@ def get_notifications() -> ResponseReturnValue:
         "unread_only", False, type=lambda x: x.lower() == "true"
     )
     autoread = request.args.get("autoread", False, type=lambda x: x.lower() == "true")
-
-    notifications = Notification.query.filter(
-        Notification.user_id == current_user.id, Notification.timestamp > since
+    notifications = (
+        db.session.query(Notification)
+        .filter_by(user_id=current_user.id)
+        .filter(Notification.timestamp > since)
     )
 
     if unread_only:
@@ -49,10 +50,13 @@ def get_notifications() -> ResponseReturnValue:
 def count_unread_notifications() -> ResponseReturnValue:
     since = request.args.get("since", 0.0, type=float)
 
-    notif_count = Notification.query.filter(
-        Notification.user_id == current_user.id,
-        Notification.read is False,
-        Notification.timestamp > since,
-    ).count()
+    notif_count = (
+        db.session.query(Notification)
+        .filter_by(user_id=current_user.id, read=False)
+        .filter(
+            Notification.timestamp > since,
+        )
+        .count()
+    )
 
     return jsonify({"status": "ok", "result": {"count": notif_count}}), 200

@@ -13,25 +13,27 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
 
-from app.extensions import profile_imgs
+from app.extensions import db, profile_imgs
 from app.models import Post, User
 
 
 # Post Id of current user's post
 def validate_post_id(form: FlaskForm, field: Field) -> None:
-    post: Post = Post.query.filter_by(id=field.data, user_id=current_user.id).first()
+    post: Post | None = (
+        db.session.query(Post).filter_by(id=field.data, user_id=current_user.id).first()
+    )
     if post is None:
         raise ValidationError("Invalid PostId")
 
 
 def validate_profile_id(form: FlaskForm, profile_id: Field) -> None:
-    user: User = User.query.filter_by(id=profile_id.data).first()
+    user: User | None = db.session.query(User).filter_by(id=profile_id.data).first()
     if user is None or user == current_user:
         return ValidationError("Invalid ProfileId")
 
 
 def validate_username(form: FlaskForm, field: Field) -> None:
-    user: User = User.query.filter_by(username=field.data).first()
+    user: User | None = db.session.query(User).filter_by(username=field.data).first()
     if user is not None:
         raise ValidationError("This username is already taken")
 

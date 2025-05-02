@@ -1,7 +1,7 @@
 from os import path, remove
 
-import sqlalchemy as sa
 from flask import (
+    abort,
     flash,
     jsonify,
     render_template,
@@ -33,8 +33,15 @@ from . import profile
 def profile_page(username: str) -> ResponseReturnValue:
     profile_form: EditProfileForm = EditProfileForm()
     follow_profile_form: FollowProfileForm = FollowProfileForm()
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(user_id=user.id).order_by(sa.desc(Post.timestamp))
+    user: User | None = db.session.query(User).filter_by(username=username).first()
+    if user is None:
+        abort(404)
+        return
+    posts: Post | None = (
+        db.session.query(Post)
+        .filter_by(user_id=user.id)
+        .order_by(Post.timestamp.desc())
+    )
 
     profile_form.bio.data = user.bio
     return render_template(
@@ -49,7 +56,9 @@ def profile_page(username: str) -> ResponseReturnValue:
 @profile.route("/pfp/<user_id>")
 @login_required
 def serve_pfp(user_id: int) -> ResponseReturnValue:
-    User.query.get_or_404(user_id)
+    if db.session.query(User).get(user_id) is None:
+        abort(404)
+        return
     img_name = secure_filename(f"{user_id}_pfp.webp")
     img_path = profile_imgs.path(img_name)
 
@@ -89,7 +98,12 @@ def edit_profile() -> ResponseReturnValue:
 def follow_profile() -> ResponseReturnValue:
     form: FollowProfileForm = FollowProfileForm()
     if form.validate_on_submit():
-        user: User = User.query.filter_by(id=form.profile_id.data).first_or_404()
+        user: User | None = (
+            db.session.query(User).filter_by(id=form.profile_id.data).first()
+        )
+        if user is None:
+            abort(404)
+            return
 
         current_user.follow(user)
         add_notification(user=user, content=f"{current_user.username} followed you!")
@@ -108,7 +122,13 @@ def follow_profile() -> ResponseReturnValue:
 def unfollow_profile() -> ResponseReturnValue:
     form: FollowProfileForm = FollowProfileForm()
     if form.validate_on_submit():
-        user: User = User.query.filter_by(id=form.profile_id.data).first_or_404()
+        user: User | None = (
+            db.session.query(User).filter_by(id=form.profile_id.data).first()
+        )
+        if user is None:
+            abort(404)
+            return
+
         current_user.unfollow(user)
         db.session.commit()
 

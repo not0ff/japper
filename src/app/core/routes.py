@@ -1,8 +1,8 @@
-import sqlalchemy as sa
 from flask import redirect, render_template, url_for
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 
+from app.extensions import db
 from app.forms import SearchPostForm
 from app.models import Post
 from app.utils import get_feed, search_post
@@ -30,7 +30,7 @@ def feed() -> ResponseReturnValue:
 @core.route("/newest/")
 @login_required
 def newest() -> ResponseReturnValue:
-    posts = Post.query.order_by(sa.desc(Post.timestamp))
+    posts: list[Post] = db.session.query(Post).order_by(Post.timestamp.desc()).all()
     return render_template("core/feed.html", posts=posts, feed_title="Newest posts")
 
 
@@ -38,8 +38,11 @@ def newest() -> ResponseReturnValue:
 @login_required
 def following() -> ResponseReturnValue:
     followed_ids = [user.id for user in current_user.following]
-    posts = Post.query.filter(Post.user_id.in_(followed_ids)).order_by(
-        sa.desc(Post.timestamp)
+    posts: list[Post] = (
+        db.session.query(Post)
+        .filter(Post.user_id.in_(followed_ids))
+        .order_by(Post.timestamp.desc())
+        .all()
     )
     return render_template(
         "core/feed.html", posts=posts, feed_title="Posts from users you follow"

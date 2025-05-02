@@ -41,7 +41,7 @@ def get_post(data: dict | None) -> tuple[Post | dict, int]:
     except (ValueError, TypeError):
         return {"status": "error", "message": "Invalid post ID"}, 400
 
-    post: Post = Post.query.get(id)
+    post: Post | None = db.session.query(Post).get(id)
     if post is None:
         return {"status": "error", "message": "Post not found"}, 404
 
@@ -57,7 +57,7 @@ def get_profile(data: dict | None) -> tuple[User | dict, int]:
     except (ValueError, TypeError):
         return {"status": "error", "message": "Invalid user ID"}, 400
 
-    user: User = User.query.get(id)
+    user: User | None = db.session.query(User).get(id)
     if user is None:
         return {"status": "error", "message": "User not found"}, 404
 
@@ -66,17 +66,13 @@ def get_profile(data: dict | None) -> tuple[User | dict, int]:
 
 def get_feed() -> Sequence[Post]:
     rank_expr = (
-        sa.select(sa.func.count())
-        .where(Like.post_id == Post.id)
-        .scalar_subquery()
-    ) / (
-        (sa.extract('epoch', sa.func.now()) - sa.extract('epoch', Post.timestamp)) + 1
-    )
-    query = (
-        sa.select(Post, rank_expr.label('rank'))
-        .order_by(sa.literal_column('rank').desc())
+        sa.select(sa.func.count()).where(Like.post_id == Post.id).scalar_subquery()
+    ) / ((sa.extract("epoch", sa.func.now()) - sa.extract("epoch", Post.timestamp)) + 1)
+    query = sa.select(Post, rank_expr.label("rank")).order_by(
+        sa.literal_column("rank").desc()
     )
     return db.session.execute(query).scalars().all()
+
 
 def add_notification(user: User, content: str, issuer: User = current_user) -> None:
     notification = Notification(user_id=user.id, issuer_id=issuer.id, content=content)
@@ -86,8 +82,9 @@ def add_notification(user: User, content: str, issuer: User = current_user) -> N
 def search_post(pattern: str) -> Sequence[Post]:
     pattern = "%".join(pattern.split())
     return (
-        Post.query.filter(Post.content.like(f"%{pattern}%"))
-        .order_by(sa.desc(Post.timestamp))
+        db.session.query(Post)
+        .filter(Post.content.like(f"%{pattern}%"))
+        .order_by(Post.timestamp.desc())
         .all()
     )
 
